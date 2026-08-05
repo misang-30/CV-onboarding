@@ -6,10 +6,7 @@ cv-onboarding/
 ├── .gitignore
 ├── environment.yml            # conda 환경 기록
 ├── docs/
-│   ├── 01-ubuntu-install.md   # 우분투 설치 기록
-│   ├── 02-nvidia-cuda.md      # 드라이버·CUDA 설치 기록
-│   ├── 03-vscode-setup.md     # VS Code 설정 기록
-│   └── 04-yolo-demo.md        # YOLO 실습 기록
+│   └── 01_yolo_demo.md        # YOLO 실습 기록
 ├── img/                    # 문서에 넣을 캡처 이미지
 └── src/
     ├── check_env.py
