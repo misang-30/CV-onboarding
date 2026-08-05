@@ -37,17 +37,17 @@ for conf in confVal :
 
 
 #### test.png
-![](lab1/img/test.png)
+![](../img/test.png)
 #### Conf=0.1, test1.jpg
-![](lab1/img/0_test1.jpg)
+![](../img/0_test1.jpg)
 
 #### Conf=0.25, test2.jpg
-![](lab1/img/0_test2.jpg)
+![](../img/0_test2.jpg)
 #### Conf=0.5, test3.jpg
-![](lab1/img/0_test3.jpg)
+![](../img/0_test3.jpg)
 
 #### Conf=0.8, test4.jpg
-![](lab1/img/0_test4.jpg)
+![](../img/0_test4.jpg)
 
 ```
 
@@ -141,15 +141,15 @@ for val in range(3) :
 
 #### yolo26n
 
-![](lab1/img/1_test1.jpg)
+![](../img/1_test1.jpg)
 
 ####  yolo26s
 
-![](lab1/img/1_test2.jpg)
+![](../img/1_test2.jpg)
 
 ####  yolo26m
 - 가장 작은 Sports Ball 까지 인식한다.
-![](lab1/img/1_test3.jpg)
+![](../img/1_test3.jpg)
 
 ```
 predict1 4명
@@ -223,13 +223,13 @@ for val in range(3) :
 
 #### imgsz = 320
 
-![](lab1/img/2_test1.jpg)
+![](../img/2_test1.jpg)
 #### imgsz = 640
 
-![](lab1/img/2_test2.jpg)
+![](../img/2_test2.jpg)
 #### imgsz = 1280
 
-![](lab1/img/2_test3.jpg)
+![](../img/2_test3.jpg)
 
 ```
 
@@ -291,11 +291,11 @@ for val in range(2) :
 
 #### CPU
 
-![](lab1/img/3_test1.jpg)
+![](../img/3_test1.jpg)
 
 #### CUDA
 
-![](lab1/img/3_test2.jpg)
+![](../img/3_test2.jpg)
 
 
 ```
@@ -432,7 +432,7 @@ cap.release()
 cv2.destroyAllWindows()
 ```
 
-![](lab1/img/YOLO_webcam.png)
+![](../img/YOLO_webcam.png)
 
 
 
@@ -464,7 +464,7 @@ for i in range(3) :
 ```
 
 
-![](lab1/img/video.png)
+![](../img/video.png)
 
 ### 1). conf
 - conf 0.1/0.25/0.5/ 0.8 비교
