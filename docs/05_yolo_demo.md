@@ -379,7 +379,8 @@ cup          conf=0.27 box=(601,493,741,657)
 ```
 
 
-![](img/except1.jpg)
+![](../img/except1.jpg)
+
 #### except2.jpg
 - 색깔과 형태를 보고 유사한 것을 찾기는 하였으나, 학습되지 않는 사물이라 파악하지 못한 것이라 판단된다.
 ```
@@ -389,7 +390,7 @@ carrot       conf=0.31 box=(500,379,618,708)
 ```
 
 
-![](img/except2.jpg)
+![](../img/except2.jpg)
 
 #### except5.jpg
 - 가려져 있거나 형태를 파악할 수 없는 상황에서는 사물을 인지조차 하지 못하는 것 같다.
@@ -400,7 +401,7 @@ couch        conf=0.81 box=(0,574,226,1078)
 dining table conf=0.38 box=(258,859,551,1279)
 ```
 
-![](img/except5.jpg)
+![](../img/except5.jpg)
 
 
 ---
