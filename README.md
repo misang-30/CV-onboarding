@@ -17,3 +17,48 @@ conda env create -f environment.yml
 conda activate pytorch_env
 python src/yolo/webcam_demo.py
 ```
+
+
+
+## Lab
+### 1). YOLO
+```
+cv-onboarding/
+├── README.md                  
+├── .gitignore
+├── environment.yml            # conda 환경 기록
+├── docs/
+│   ├── 01-ubuntu-install.md   # 우분투 설치 기록
+│   ├── 02-nvidia-cuda.md      # 드라이버·CUDA 설치 기록
+│   ├── 03-vscode-setup.md     # VS Code 설정 기록
+│   └── 04-yolo-demo.md        # YOLO 실습 기록
+├── img/                       # 문서에 넣을 캡처 이미지
+└── src/
+    ├── check_env.py
+    └── yolo/
+        ├── predict_image.py
+        ├── predict_video.py
+        └── webcam_demo.py
+```
+
+
+### 2). Model Train
+```
+cv-onboarding/
+├── docs/
+│   ├── 01-ubuntu-install.md      # 기존
+│   ├── ...
+│   ├── 05-training-basics.md     # 이번 주 문서 1: 학습 파이프라인 구축 기록
+│   └── 06-experiments.md         # 이번 주 문서 2: 실험 노트 (핵심 산출물)
+└── src/
+    └── train/
+        ├── data.py               # Dataset / DataLoader / split
+        ├── model.py              # 직접 구현한 CNN
+        ├── train.py              # 학습 루프
+        ├── plot_curves.py        # CSV → 곡선 그리기 (Day 1~2용)
+        └── configs/
+            └── baseline.yaml
+```
+
+
+
