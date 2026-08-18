@@ -287,7 +287,49 @@ print(f"y[:10]  : {labels[:10]}")
 ## 3. 모델 직접 구현 (Day 2)
 - src/train/model.py 에 SmallCNN(nn.Module)을 만든다.
 
+### 1). 모델 스펙
 
+#### Block 1 
+
+- `Conv3x3(pad=1) → BN → ReLU → Conv3x3(pad=1) → BN → ReLU → MaxPool2x2`
+- 입출력 : `3×32×32` → `C×16×16`
+- 컨볼루션 층을 거치면 C x 32 x 32 가 된다. (C는 필터 개수)  
+- 3x32x32 이미지를 필터 3x3x3에 통과시키면 1x32x32 1개가 나온다.
+- 필터가 C 개이면 결과물은 1x32x32xC 가 된다. (C개의 필터가 각각 1x32x32 결과물을 내놓는다.)
+- 따라서 결과물은 Cx32x32 가 된다.
+
+
+#### Block 2 
+- `Conv3x3(pad=1) → BN → ReLU → Conv3x3(pad=1) → BN → ReLU → MaxPool2x2`
+- 입출력 : `C×16×16` → `2C×8×8`
+
+#### Block 3 
+- `Conv3x3(pad=1) → BN → ReLU → Conv3x3(pad=1) → BN → ReLU → MaxPool2x2`
+- 입출력 : `2C×8×8` → `4C×4×4`
+
+#### Head 
+- `AdaptiveAvgPool2d(1) → Flatten → Linear(4C, 10)`
+- 입출력 : `4C×4×4` → `10`
+
+
+
+
+### 2). 구현 코드
+
+
+
+``` python
+
+
+
+```
+
+
+### 3). 체크
+
+``` python
+
+```
 
 
 
