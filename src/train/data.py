@@ -5,6 +5,10 @@ import matplotlib.pyplot as plt
 from torchvision import datasets, transforms
 from torch.utils.data import random_split, DataLoader
 
+
+
+## ============== 데이터셋을 정리 ============== 
+
 train_full = datasets.CIFAR10(root="./data", train=True,  download=True)
 test_set   = datasets.CIFAR10(root="./data", train=False, download=True)
 print(len(train_full), len(test_set))   # 50000 10000
