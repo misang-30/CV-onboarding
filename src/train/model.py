@@ -1,3 +1,4 @@
+# ruff: noqa
 import torch as torch
 from torch import nn
 
