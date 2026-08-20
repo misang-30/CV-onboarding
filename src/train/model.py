@@ -44,12 +44,21 @@ class SmallCNN ( nn.Module) :
 
         )
  
-    def forward(self, x: torch.Tensor) :
+    def forward(self, x: torch.Tensor) : 
+        #forward : 순전파, 입력을 받아서 출력으로 변환하는 과정. predict()와 다르다.
         x = self.block1(x)
         x = self.block2(x)
         x = self.block3(x)
         x = self.head(x)
         return x
+
+    def predict(self, x : torch.Tensor) : 
+        # not yet implemented
+        print("not yet implemented")
+
+
+
+
 
 # shape 확인
 model = SmallCNN(width=32)
