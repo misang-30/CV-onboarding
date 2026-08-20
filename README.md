@@ -51,13 +51,18 @@ cv-onboarding/
 │   ├── 05-training-basics.md     # 이번 주 문서 1: 학습 파이프라인 구축 기록
 │   └── 06-experiments.md         # 이번 주 문서 2: 실험 노트 (핵심 산출물)
 └── src/
-    └── train/
+    └── train/                    # 정리된 코드
         ├── data.py               # Dataset / DataLoader / split
         ├── model.py              # 직접 구현한 CNN
         ├── train.py              # 학습 루프
         ├── plot_curves.py        # CSV → 곡선 그리기 (Day 1~2용)
         └── configs/
             └── baseline.yaml
+        └── old/                           # 결과물만 확인한 코드
+            ├── data_prev.py               # Day1 : 데이터 불러오기
+            ├── model_prev.py              # Day2 : 모델 직접 구현하기 
+            └── train_prev.py              # Day3 : 학습 루프 구현하기 
+        
 ```
 
 
