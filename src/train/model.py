@@ -59,13 +59,5 @@ class SmallCNN ( nn.Module) :
 
 
 
-
-# shape 확인
-model = SmallCNN(width=32)
-x = torch.randn(2, 3, 32, 32) # 이미지 2개 넣은 것이다.
-print(model(x).shape)    # (2, 10)이어야한다 ->  확인 
-print(sum(p.numel() for p in model.parameters() if p.requires_grad))
-
-
-
-
+if __name__ == "__main__" :
+    print("Direct Call")
