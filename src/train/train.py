@@ -9,13 +9,11 @@ from model import SmallCNN
 from data  import get_dataloaders
 from data  import get_hyperparameter
 from data  import set_hyperparameter
+from torch.utils.data import DataLoader
+from typing import Dict, Any
 
+def train (train_loader :DataLoader,val_loader : DataLoader, hyperparameter : Dict[str, Any], csv_path : str = "training_log.csv" ) :
 
-def train () :
-    # ================== 학습 데이터셋 / 하이퍼파라미터==================
-
-    train_loader, val_loader = get_dataloaders()
-    hyperparameter = get_hyperparameter() 
 
 
     # ================== 모델 학습 ==================
@@ -43,7 +41,7 @@ def train () :
 
 
     # 저장할 파일 설정
-    csv_path = "training_log.csv"
+
     with open(csv_path, mode = 'w', newline="", encoding="utf-8") as f :
         writer = csv.writer(f)
         writer.writerow(["epoch", "lr", "train_loss", "train_acc", "val_loss", "val_acc"])
@@ -97,7 +95,7 @@ def train () :
 
 
         # ---------- validate ----------
-        # 4) 모델을 평가 모드로
+        # 4) 모델을 평가 모드로자막을 옮겨 적지 말고요.
         model.eval() # 평가 모드로 전환, dropout, batchnorm 등 학습용 레이어 비활성화
 
 
@@ -137,7 +135,11 @@ def train () :
         # 8) 콘솔에도 한 줄 출력
         print(f"Epoch [{epoch}/{hyperparameter['epochs']}] 저장 완료!")
 
+
+
 if __name__ == "__main__" :
     print("Direct Call")
-    train() 
+    train_loader, val_loader = get_dataloaders()
+    hyperparameter = get_hyperparameter() 
+    train(train_loader, val_loader,hyperparameter ) 
     

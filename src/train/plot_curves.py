@@ -1,12 +1,13 @@
 
+# ruff: noqa
 import matplotlib.pyplot as plt
 import pandas as pd
 
 
 
-def plot() : 
+def plot(fileName : str,saveAddr : str = "../../img/train_plt.png") : 
     # 1). Train 데이터 가져오기
-    df =pd.read_csv("training_log.csv")
+    df =pd.read_csv(fileName)
     epochs = df["epoch"]
     train_loss = df["train_loss"]
     val_loss = df["val_loss"]
@@ -37,9 +38,11 @@ def plot() :
     ax2.grid(True)
 
     plt.tight_layout()
-    plt.savefig("../../img/train_plt.png")
-    plt.show()
+    plt.savefig(saveAddr)
+    #plt.show()
+    plt.close()
         
 
 if __name__ == "__main__" :
-    plot() 
+    fileName = "training_log.csv"
+    plot(fileName) 
