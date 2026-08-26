@@ -1,21 +1,4 @@
-## 0. 저장소
-```
-cv-onboarding/
-├── docs/
-│   ├── 01-ubuntu-install.md
-│   ├── ...
-│   ├── 05-training-basics.md     # 이번 주 문서 1: 학습 파이프라인 구축 기록
-│   └── 06-experiments.md         # 이번 주 문서 2: 실험 노트 (핵심 산출물)
-└── src/
-    └── train/
-        ├── data.py               # Dataset / DataLoader / split
-        ├── model.py              # 직접 구현한 CNN
-        ├── train.py              # 학습 루프
-        ├── plot_curves.py        # CSV → 곡선 그리기 (Day 1~2용)
-        └── configs/
-            └── baseline.yaml
-```
----
+- 학습 파이프라인 구축 기록을 정리
 
 ## 1. 로컬 저장소
 - .gitignore 파일에 아래 내용을 추가하라.
@@ -44,7 +27,7 @@ pip install torch torchvision
 ```
 ### 2). 이미지 격자 
 
-![](img/cifar10_samples.png)
+![](../img/cifar10_samples.png)
 
 ### 3).  텐서 변환, 정규화, split
 
