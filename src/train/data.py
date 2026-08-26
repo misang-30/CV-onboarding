@@ -9,14 +9,17 @@ epochs = 30 # 에폭 수 , 총 데이터셋을 몇번 돌릴지.
 learning_rate = 0.005 # 학습률, 가중치 업데이트 시 얼마나 크게 반영할지 결정하는 하이퍼파라미터
 momentum = 0.9 # 모멘텀, 이전 기울기 정보를 얼마나 반영할지 결정하는 하이퍼파라미터
 weight_decay = 0 # 가중치 감쇠(regularization) 정도를 결정하는 하이퍼파라미터
-
+train_num = 45000
+val_num = 5000
 def get_hyperparameter ():
 	hyperparmeter = {
 		"batch_size": batch_size,
 		"epochs" : epochs,
 		"lr" : learning_rate,
 		"momentum" : momentum,
-		"weight_decay" : weight_decay
+		"weight_decay" : weight_decay,
+		"train_num" : train_num,
+		"val_num" : val_num
 	}
 	return hyperparmeter
 
@@ -28,6 +31,8 @@ def set_hyperparameter(config: Dict[str, Any]):
 	learning_rate = config["lr"]
 	momentum = config["momentum"]
 	weight_decay = config["weight_decay"]
+	train_num = config["train_num"]
+	val_num = config["val_num"]
 
 
 def get_dataloaders (): 
@@ -48,7 +53,7 @@ def get_dataloaders ():
 	# 2). train/validation 데이터셋 분리
 	train_data, val_data = random_split(
 		train_full,
-		[45000,5000],
+		[train_num,val_num],
 		generator = generator
 	)
 
