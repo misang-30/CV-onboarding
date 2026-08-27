@@ -61,4 +61,22 @@ class SmallCNN ( nn.Module) :
 
 
 if __name__ == "__main__" :
-    print("Direct Call")
+    print("Direct Call ")
+
+    print(">> width 16")
+    model = SmallCNN(width=16)
+    x = torch.randn(2, 3, 32, 32)
+    print(model(x).shape)                                              # (2, 10) 이어야 함
+    print(sum(p.numel() for p in model.parameters() if p.requires_grad))
+
+    print(">> width 32")
+    model = SmallCNN(width=32)
+    x = torch.randn(2, 3, 32, 32)
+    print(model(x).shape)                                              # (2, 10) 이어야 함
+    print(sum(p.numel() for p in model.parameters() if p.requires_grad))
+
+    print(">> width 64")
+    model = SmallCNN(width=64)
+    x = torch.randn(2, 3, 32, 32)
+    print(model(x).shape)                                              # (2, 10) 이어야 함
+    print(sum(p.numel() for p in model.parameters() if p.requires_grad))

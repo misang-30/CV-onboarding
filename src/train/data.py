@@ -95,5 +95,14 @@ def get_dataloaders ():
 	show_hyperparameter()
 	return train_loader, val_loader
 
+def getTest_dataloaders() :
+	test_set = datasets.CIFAR10(
+		root="./data", 
+		train=False, 
+		download=True
+	)
+
+
+
 if __name__ == "__main__" :
     print("Direct Call")
