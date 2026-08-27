@@ -24,11 +24,12 @@ hyperparameter = {
 	
 training_log = "training_log_overfit.csv"
 plotAddr = "../../img/overfitting_plot.png"
+width = 64
 
 def overfitLab() : 
     set_hyperparameter(hyperparameter) 
     train_loader, val_loader = get_dataloaders()
-    train(train_loader, val_loader, hyperparameter, training_log)
+    train(train_loader, val_loader, hyperparameter, training_log, width)
     plot(training_log, plotAddr )
 
 
@@ -36,4 +37,5 @@ def overfitLab() :
     
 if __name__ == "__main__" :
     print("Direct Call")
+    print("Day 4 Lab : Overfitting ")
     overfitLab() 

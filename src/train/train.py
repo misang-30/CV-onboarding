@@ -11,8 +11,9 @@ from data  import get_hyperparameter
 from data  import set_hyperparameter
 from torch.utils.data import DataLoader
 from typing import Dict, Any
+from plot_curves import plot
 
-def train (train_loader :DataLoader,val_loader : DataLoader, hyperparameter : Dict[str, Any], csv_path : str = "training_log.csv" ) :
+def train (train_loader :DataLoader,val_loader : DataLoader, hyperparameter : Dict[str, Any], csv_path : str = "training_log.csv", widthVal : int = 32) :
 
 
 
@@ -24,10 +25,10 @@ def train (train_loader :DataLoader,val_loader : DataLoader, hyperparameter : Di
     # model.parameters() : 모델의 학습 가능한 모든 파라미터를 반환합니다.
 
 
-
+    print(f"Train Start ! , Width = {widthVal}")
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu") # GPU 세팅
 
-    model = SmallCNN(width=32, dropout_p=0.5).to(device) # 모델 생성
+    model = SmallCNN(width=widthVal, dropout_p=0).to(device) # 모델 생성
     criterion = nn.CrossEntropyLoss() # 손실함수 정의 (분류 문제)
     optimizer = torch.optim.SGD( # 옵티마이저 정의
         model.parameters(), 
@@ -139,7 +140,9 @@ def train (train_loader :DataLoader,val_loader : DataLoader, hyperparameter : Di
 
 if __name__ == "__main__" :
     print("Direct Call")
+    print("Day 2 Lab : Train Loop")
     train_loader, val_loader = get_dataloaders()
     hyperparameter = get_hyperparameter() 
     train(train_loader, val_loader,hyperparameter ) 
-    
+    fileName = "training_log.csv"
+    plot(fileName) 

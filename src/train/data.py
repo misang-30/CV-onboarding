@@ -78,7 +78,7 @@ def get_dataloaders ():
 	train_loader = DataLoader(
 		train_data, 
 		batch_size =batch_size, 
-		shuffle=True,
+		shuffle=True, # 편향을 막기 위해 필요하다.
 		num_workers=4, # CPU 코어
 		pin_memory = True, 
 		drop_last = False
@@ -87,7 +87,7 @@ def get_dataloaders ():
 	val_loader = DataLoader(
 		val_data,
 		batch_size = batch_size,
-		shuffle = False,
+		shuffle = False, # 검증용도라 셔플 필요가 없다.
 		num_workers = 4,
 		pin_memory = True,
 		drop_last = False
@@ -106,3 +106,4 @@ def getTest_dataloaders() :
 
 if __name__ == "__main__" :
     print("Direct Call")
+    print("Day 1 Lab : Dataloading ")
