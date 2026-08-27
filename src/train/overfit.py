@@ -36,6 +36,6 @@ def overfitLab() :
 
     
 if __name__ == "__main__" :
-    print("Direct Call")
-    print("Day 4 Lab : Overfitting ")
+    print("<< Direct Call >>")
+    print("<< Day 4 Lab : Overfitting >>")
     overfitLab() 

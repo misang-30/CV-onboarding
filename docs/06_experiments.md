@@ -99,11 +99,61 @@
 ---
 ## 3. 학습 루프 구현 
 
+> [Hyperparameter]
+> width 32
+>  trainData 45,000 
+>  valData 5,000
+>  epochs 30
+>  batch size 128
+>  learning rate   0.005
+>  weight_decay = 0.0
+>  momentum = 0.9
+>  drop 
+
+
+![](../img/train_plt.png)
+
+> Val accuracy는 최소 70% 이상 나온다.
+> baseline 30 epoch이 5분 이내로 끝난다
+
+
+
+---
 
 
 ## 4.  과적합 제조 실험
 
+> [Hyperparameter]
+>  trainData 500 
+>  valData 5,000
+>  epochs 100
+>  batch size 128
+>  width 64
+>  learning rate  0.005 
 
+![](../img/overfitting_plot.png)
+
+> [ 분석 ]
+> 1.100 epoch이 2분 안에 끝났다.
+> 2.train accuracy가 100%에 도달하였다.
+> 3.val accuracy는 훨씬 낮은 곳에서 정체 하였다
+> 4.train loss가 0에 가깝게 떨어진다.
+> 5.val loss가 epoch 37에서 1.6825로 최저점을 찍고 다시 올라간다.
+> 6.val acc가 epoch 87, 96에서 0.4690으로 최고 점을 찍는다.
+> 7.Loss를 기준으로 Best Epoch를 잡는 것이 과적합 시점을 잡는데 유용할 것으로 판단된다.
+
+### 1). 왜  val loss와 val accuracy가 어긋나는가?
+- CrossEntropy는 틀린 정도를 반영하지만 accuracy는 맞았는지만 반영한다.
+- 학습 데이터 수가 적으므로 모델이 맞히던 건 계속 맞히면서 확신만 점점 세지고, 틀리는 것들은 높은 확신으로 틀리게 된다.
+- CrossEntropy 손실 함수는 잘못된 예측에 강한 확률을 부여할 때 손실값을 아주 높게 부과하므로, 전체적인 val_loss는 위로 솟구치게 된다.
+
+
+### 2). Early Stopping과 Checkpoint 직접 구현
+## train.py에 추가해야한다.
+## 8월 27일 여기 까지했다.
+
+
+---
 
 ## 5. 실험 관리 도구
 

@@ -96,7 +96,7 @@ def train (train_loader :DataLoader,val_loader : DataLoader, hyperparameter : Di
 
 
         # ---------- validate ----------
-        # 4) 모델을 평가 모드로자막을 옮겨 적지 말고요.
+        # 4) 모델을 평가 모드로
         model.eval() # 평가 모드로 전환, dropout, batchnorm 등 학습용 레이어 비활성화
 
 
@@ -107,10 +107,11 @@ def train (train_loader :DataLoader,val_loader : DataLoader, hyperparameter : Di
                 x = x.to(device) # 데이터를 CPU 메모리에서 GPU 메모리로 옮기기
                 y = y.to(device)
                 pred = model(x) 
+                val_step_loss = criterion(pred, y)
 
                 preds = pred.argmax(dim=1) # 예측값 중 가장 큰 값의 인덱스를 가져온다. 
                 val_correct += torch.sum(preds == y ).item()
-                val_loss += loss.item() * x.size(0) # loss.item() : loss를 스칼라로 변환, x.size(0) : 배치 크기
+                val_loss += val_step_loss.item() * x.size(0) # loss.item() : loss를 스칼라로 변환, x.size(0) : 배치 크기
                                     
         # 6) val_loss, val_acc 계산
         epoch_val_loss = val_loss / len(val_loader.dataset) # 평균 loss 계산
@@ -139,8 +140,8 @@ def train (train_loader :DataLoader,val_loader : DataLoader, hyperparameter : Di
 
 
 if __name__ == "__main__" :
-    print("Direct Call")
-    print("Day 2 Lab : Train Loop")
+    print("<< Direct Call >> \n")
+    print("<< Day 2 Lab : Train Loop >>\n")
     train_loader, val_loader = get_dataloaders()
     hyperparameter = get_hyperparameter() 
     train(train_loader, val_loader,hyperparameter ) 

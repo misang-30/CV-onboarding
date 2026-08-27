@@ -61,8 +61,8 @@ class SmallCNN ( nn.Module) :
 
 
 if __name__ == "__main__" :
-    print("Direct Call ")
-    print("Day 2 Lab : Model Build")
+    print("<< Direct Call >> \n ")
+    print("<< Day 2 Lab : Model Build >>\n")
 
     print(">> width 16")
     model = SmallCNN(width=16)

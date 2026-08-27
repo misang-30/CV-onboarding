@@ -58,17 +58,14 @@ def get_dataloaders ():
 	)
 	generator = torch.Generator().manual_seed(42)
 
+	unused_num = len(train_full)-(train_num+val_num)
 	# 2). train/validation 데이터셋 분리
-	f_, b_ = random_split(
+	train_data, val_data, _ = random_split(
 		train_full,
-		[train_num+val_num,len(train_full)-(train_num+val_num)],
+		[train_num, val_num, unused_num],
 		generator = generator
 	)
-	train_data, val_data = random_split(
-		f_,
-		[train_num, val_num],
-		generator = generator
-	)
+
 	# print("train data :", len(train_data))
 	# print("validation data :", len(val_data))
 
@@ -105,5 +102,5 @@ def getTest_dataloaders() :
 
 
 if __name__ == "__main__" :
-    print("Direct Call")
-    print("Day 1 Lab : Dataloading ")
+    print("<< Direct Call >> \n")
+    print("<< Day 1 Lab : Dataloading >> \n")
