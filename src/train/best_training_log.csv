@@ -1,2 +1,4 @@
 width,best_epoch,best_val_loss,epoch_val_acc
 32,10,0.6209,0.7876
+32,7,0.6612,0.7048
+32,14,0.6176,0.7982

@@ -17,7 +17,7 @@ from plot_curves import plot
 
 
 
-def train (train_loader :DataLoader,val_loader : DataLoader, hyperparameter : Dict[str, Any], csv_path : str = "training_log.csv") :
+def train (train_loader :DataLoader,val_loader : DataLoader, hyperparameter : Dict[str, Any], csv_path : str = "training_log.csv", wandbOn: bool =True) :
 
     # hyperparameter 읽어오기.
     
@@ -144,8 +144,9 @@ def train (train_loader :DataLoader,val_loader : DataLoader, hyperparameter : Di
                 round(epoch_val_loss, 4),
                 round(epoch_val_acc, 4),
             ])
-        wandb.log({"epoch": epoch, "train/loss": epoch_train_loss, "train/acc": epoch_train_acc,
-           "val/loss": epoch_val_loss, "val/acc": epoch_val_acc, "lr": hyperparameter["lr"]})    
+        if wandbOn :
+            wandb.log({"epoch": epoch, "train/loss": epoch_train_loss, "train/acc": epoch_train_acc,
+            "val/loss": epoch_val_loss, "val/acc": epoch_val_acc, "lr": hyperparameter["lr"]})    
 
         # 8) 콘솔에도 한 줄 출력
         print(f"Epoch [{epoch}/{hyperparameter['epochs']}] 저장 완료!")
@@ -175,9 +176,10 @@ def train (train_loader :DataLoader,val_loader : DataLoader, hyperparameter : Di
                 if not file_exists:
                     writer.writerow(["width", "best_epoch", "best_val_loss", "epoch_val_acc"])
                 writer.writerow([hyperparameter["width"], best_epoch, round(bestVal_loss, 4), round(epoch_val_acc, 4)])
-            wandb.summary["best_val_acc"] = epoch_val_acc
-            wandb.summary["best_epoch"] = best_epoch
-            wandb.finish()
+            if wandbOn :
+                wandb.summary["best_val_acc"] = epoch_val_acc
+                wandb.summary["best_epoch"] = best_epoch
+                wandb.finish()
             break
 
 

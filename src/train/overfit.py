@@ -19,7 +19,7 @@ plotAddr = "../../img/overfitting_plot.png"
 def overfitLab() : 
     hyperparameter = get_hyperparameter("configs/baseline_overfit.yaml") 
     train_loader, val_loader = get_dataloaders()
-    train(train_loader, val_loader, hyperparameter, training_log)
+    train(train_loader, val_loader, hyperparameter, training_log, wandbOn =False)
     plot(training_log, plotAddr )
 
 
