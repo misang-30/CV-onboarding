@@ -1,6 +1,6 @@
 # ruff: noqa
 import csv
-
+import os
 
 import torch as torch
 from torch import nn
@@ -42,11 +42,17 @@ def train (train_loader :DataLoader,val_loader : DataLoader, hyperparameter : Di
 
 
     # 저장할 파일 설정
+    os.makedirs('checkpoints', exist_ok=True)
 
     with open(csv_path, mode = 'w', newline="", encoding="utf-8") as f :
         writer = csv.writer(f)
         writer.writerow(["epoch", "lr", "train_loss", "train_acc", "val_loss", "val_acc"])
             
+
+    # 최고 epoch의 지표
+    bestVal_loss = float('inf') # 양의 무한대 사용.
+    patience = 0
+    best_epoch = 0
 
 
     for epoch in range(1, hyperparameter["epochs"] + 1) :
@@ -90,12 +96,13 @@ def train (train_loader :DataLoader,val_loader : DataLoader, hyperparameter : Di
             train_loss += loss.item() * x.size(0) # loss.item() : loss를 스칼라로 변환, x.size(0) : 배치 크기
         # 3). epoch 횟수별 평균 train_loss, train_acc 계산
         epoch_train_loss = train_loss / len(train_loader.dataset) # 평균 loss 계산
-        epoch_train_acc = train_correct / len(train_loader.dataset) # 평균 정확도 계산
+        epoch_train_acc = train_correct / len(train_loader.dataset) # 평균 정확도 계산     
         print(f"Epoch [{epoch}/{hyperparameter['epochs']}], Train Loss: {epoch_train_loss:.4f}, Train Acc: {epoch_train_acc:.4f}")
 
 
 
         # ---------- validate ----------
+
         # 4) 모델을 평가 모드로
         model.eval() # 평가 모드로 전환, dropout, batchnorm 등 학습용 레이어 비활성화
 
@@ -137,6 +144,35 @@ def train (train_loader :DataLoader,val_loader : DataLoader, hyperparameter : Di
         # 8) 콘솔에도 한 줄 출력
         print(f"Epoch [{epoch}/{hyperparameter['epochs']}] 저장 완료!")
 
+        # 9) Early Stooping & CheckPoint (Standard = Loss)
+
+
+        if bestVal_loss > epoch_val_loss : 
+            bestVal_loss = epoch_val_loss
+            patience = 0 
+            best_epoch = epoch
+            # model.state_dict() 저장.
+            torch.save(model.state_dict(), 'checkpoints/best.pt')
+
+
+        else : patience += 1   
+
+        if patience >= 10 :   # best_epoch, best_val_matric 출력, CSV/ 로그에 남기기
+            print("[Over Patience, Training Over ! ]") 
+            print(f"[ Best Epoch : {best_epoch} ]")
+            print(f"[ Best Loss : {bestVal_loss} ]")
+            
+            # CSV / 로그 저장
+            best_csv_path = "best_" + csv_path
+            file_exists = os.path.exists(best_csv_path)
+
+            with open(best_csv_path, 'a', newline='', encoding="utf-8") as f:
+                writer = csv.writer(f)
+                if not file_exists:
+                    writer.writerow(["width", "best_epoch", "best_val_loss", "epoch_val_acc"])
+                writer.writerow([widthVal, best_epoch, round(bestVal_loss, 4), round(epoch_val_acc, 4)])
+
+            break
 
 
 if __name__ == "__main__" :
