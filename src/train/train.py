@@ -9,6 +9,7 @@ from torch import optim
 from model import SmallCNN
 from data  import get_dataloaders
 from data  import get_hyperparameter
+from data  import set_seed
 from torch.utils.data import DataLoader
 from typing import Dict, Any
 from plot_curves import plot
@@ -29,7 +30,7 @@ def train (train_loader :DataLoader,val_loader : DataLoader, hyperparameter : Di
     # model.parameters() : 모델의 학습 가능한 모든 파라미터를 반환합니다.
 
 
-    print(f"Train Start ! , Width = {hyperparameter["width"]}")
+    print(f"Train Start ! , Width = {hyperparameter['width']}")
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu") # GPU 세팅
 
     model = SmallCNN(width=hyperparameter["width"], dropout_p=0).to(device) # 모델 생성
@@ -175,7 +176,7 @@ def train (train_loader :DataLoader,val_loader : DataLoader, hyperparameter : Di
                     writer.writerow(["width", "best_epoch", "best_val_loss", "epoch_val_acc"])
                 writer.writerow([hyperparameter["width"], best_epoch, round(bestVal_loss, 4), round(epoch_val_acc, 4)])
             wandb.summary["best_val_acc"] = epoch_val_acc
-            wandb.summary["best_epoch"] = bestVal_loss
+            wandb.summary["best_epoch"] = best_epoch
             wandb.finish()
             break
 
@@ -184,20 +185,24 @@ if __name__ == "__main__" :
     print("<< Direct Call >> \n")
     print("<< Day 2 Lab : Train Loop >>\n")
 
-
+    
     # 실험 이름과 하이퍼 파리미터 받는다.
     hyperparameter = get_hyperparameter() # depends on "baseline.yaml"
     config = hyperparameter
 
-    run_name = "base_w" + hyperparameter["width"]
-    run_name = run_name + "_lr" + hyperparameter["lr"]
-    run_name = run_name + "_bat" + hyperparameter["batch_size"]
-    run_name = run_name + "_epch" + hyperparameter["epochs"]
+    run_name = (
+        f"base_w{hyperparameter['width']}"
+        f"_lr{hyperparameter['lr']}"
+        f"_bat{hyperparameter['batch_size']}"
+        f"_ep{hyperparameter['epochs']}"
+    )
 
     # train 시작 
+    set_seed(hyperparameter['seed'])
+
     wandb.init(project="cifar10-onboarding", name = run_name, config=hyperparameter)
     train_loader, val_loader = get_dataloaders()
-    hyperparameter = get_hyperparameter() 
+
     train(train_loader, val_loader,hyperparameter ) 
     fileName = "training_log.csv"
     plot(fileName) 

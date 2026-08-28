@@ -1,6 +1,8 @@
 # ruff: noqa
 import yaml
 import os 
+import random
+import numpy as np
 
 import torch as torch
 from torchvision import datasets, transforms
@@ -41,7 +43,14 @@ def get_hyperparameter (config_path : str = "configs/baseline.yaml"):
 	return hyperparameter
 
 
-# 여기서 부터 딕셔너리에서 데이터 끌어올 필요가 있다.
+# Seed 고정 함수
+def set_seed(seed: int):
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+
+
 def get_dataloaders (): 
 	# ================== 학습 환경 설정 ==================
 	# 1). 데이터셋 불러오기 (CIFAR10 :  텐서변환, 정규화)
