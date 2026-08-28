@@ -108,7 +108,7 @@
 >  learning rate   0.005
 >  weight_decay = 0.0
 >  momentum = 0.9
->  drop 
+>  dropout = 0
 
 
 ![](../img/train_plt.png)
@@ -131,7 +131,7 @@
 >  width 64
 >  learning rate  0.005 
 
-![](../img/overfitting_plot.png)
+![](../img/overfitting_plot2.png)
 
 > [ 분석 ]
 > 1.100 epoch이 2분 안에 끝났다.
@@ -149,18 +149,25 @@
 
 
 ### 2). Early Stopping과 Checkpoint 직접 구현
-## train.py에 추가해야한다.
-## 8월 27일 여기 까지했다.
 
+- Accuracy의 경우, epoch이 증가함에 따라 높은 Cofidence를 가지고 맞히거나 틀리기 때문에 Loss를 기준으로 성능 평가를 하는 것이 맞다.
+- 
+- GPU 시간이 무한하다면, Patience를 아주 크게 잡고 끝까지 돌린 후, 가장 Best CheckPoint를 찾는 것이 좋다. Loss는 정체기에 있더라도 변동성이 있기 때문에 많은 반복을 통해 최선의 경우를 찾을 수 있다.
+- 
+- GPU 시간이 유한하다면, Patience를 작게 설정하여 일찍 멈추는 것이 좋다. 무의미한 과적합을 보는 것 보다 다른 하이퍼파라미터로 실험을 해보는 것이 더 유리하다.
+- 
 
 ---
 
 ## 5. 실험 관리 도구
+- Wandb Ai 툴
+- 
 
-
+---
 ## 6.  통제 실험
 
 
 
+---
 ## 7. 함정 체험
 
