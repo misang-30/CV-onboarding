@@ -9,6 +9,7 @@ from torch import optim
 from model import SmallCNN
 from data  import get_dataloaders
 from data  import get_hyperparameter
+from data  import set_hyperparameter
 from torch.utils.data import DataLoader
 from typing import Dict, Any
 from plot_curves import plot
@@ -16,7 +17,7 @@ from plot_curves import plot
 
 
 
-def train (train_loader :DataLoader,val_loader : DataLoader, hyperparameter : Dict[str, Any], csv_path : str = "training_log.csv") :
+def train (train_loader :DataLoader,val_loader : DataLoader, hyperparameter : Dict[str, Any], csv_path : str = "training_log.csv", widthVal : int = 32) :
 
     # hyperparameter 읽어오기.
     
@@ -29,10 +30,10 @@ def train (train_loader :DataLoader,val_loader : DataLoader, hyperparameter : Di
     # model.parameters() : 모델의 학습 가능한 모든 파라미터를 반환합니다.
 
 
-    print(f"Train Start ! , Width = {hyperparameter["width"]}")
+    print(f"Train Start ! , Width = {widthVal}")
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu") # GPU 세팅
 
-    model = SmallCNN(width=hyperparameter["width"], dropout_p=0).to(device) # 모델 생성
+    model = SmallCNN(width=widthVal, dropout_p=0).to(device) # 모델 생성
     criterion = nn.CrossEntropyLoss() # 손실함수 정의 (분류 문제)
     optimizer = torch.optim.SGD( # 옵티마이저 정의
         model.parameters(), 
@@ -173,7 +174,7 @@ def train (train_loader :DataLoader,val_loader : DataLoader, hyperparameter : Di
                 writer = csv.writer(f)
                 if not file_exists:
                     writer.writerow(["width", "best_epoch", "best_val_loss", "epoch_val_acc"])
-                writer.writerow([hyperparameter["width"], best_epoch, round(bestVal_loss, 4), round(epoch_val_acc, 4)])
+                writer.writerow([widthVal, best_epoch, round(bestVal_loss, 4), round(epoch_val_acc, 4)])
             wandb.summary["best_val_acc"] = epoch_val_acc
             wandb.summary["best_epoch"] = bestVal_loss
             wandb.finish()
@@ -186,16 +187,10 @@ if __name__ == "__main__" :
 
 
     # 실험 이름과 하이퍼 파리미터 받는다.
-    hyperparameter = get_hyperparameter() # depends on "baseline.yaml"
-    config = hyperparameter
 
-    run_name = "base_w" + hyperparameter["width"]
-    run_name = run_name + "_lr" + hyperparameter["lr"]
-    run_name = run_name + "_bat" + hyperparameter["batch_size"]
-    run_name = run_name + "_epch" + hyperparameter["epochs"]
 
     # train 시작 
-    wandb.init(project="cifar10-onboarding", name = run_name, config=hyperparameter)
+    wandb.init(project="cifar10-onboarding", name = run_name, config=cfg)
     train_loader, val_loader = get_dataloaders()
     hyperparameter = get_hyperparameter() 
     train(train_loader, val_loader,hyperparameter ) 

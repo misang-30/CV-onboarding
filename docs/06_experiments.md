@@ -111,7 +111,7 @@
 >  dropout = 0
 
 
-![](../img/train_plt.png)
+![](../img/train_plt2.png)
 
 > Val accuracy는 최소 70% 이상 나온다.
 > baseline 30 epoch이 5분 이내로 끝난다

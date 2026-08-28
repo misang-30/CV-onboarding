@@ -1,5 +1,5 @@
 # ==========================================
-# CIFAR-10 Onboarding Baseline Configuration
+# CIFAR-10 Overfit Baseline Configuration
 # ==========================================
 # Literally Hyperparameter 
 
@@ -8,12 +8,15 @@
 lr: 0.005            # Learning Rate (학습률)
 momentum: 0.9        # SGD Optimizer Momentum
 weight_decay: 0.0    # L2 Regularization (가중치 감쇠)
-epochs: 30           # 전체 학습 에폭 수
+epochs: 100          # 전체 학습 에폭 수
 
 
 # [모델 및 데이터 관련 설정]
-width: 32            # SmallCNN 모델 채널 폭 (Width)
+width: 64            # SmallCNN 모델 채널 폭 (Width)
 batch_size: 128      # 배치 크기
 seed: 42             # 재현성을 위한 난수 시드 고정
-train_num : 45000    # train data 수
+train_num : 500      # train data 수
 val_num : 5000       # validation data 수
+
+
+
