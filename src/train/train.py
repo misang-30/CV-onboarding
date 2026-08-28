@@ -145,13 +145,11 @@ def train (train_loader :DataLoader,val_loader : DataLoader, hyperparameter : Di
         print(f"Epoch [{epoch}/{hyperparameter['epochs']}] 저장 완료!")
 
         # 9) Early Stooping & CheckPoint (Standard = Loss)
-
-
+        # 함수로 만들 필요가 있다.
         if bestVal_loss > epoch_val_loss : 
             bestVal_loss = epoch_val_loss
             patience = 0 
             best_epoch = epoch
-            # model.state_dict() 저장.
             torch.save(model.state_dict(), 'checkpoints/best.pt')
 
 
@@ -161,7 +159,7 @@ def train (train_loader :DataLoader,val_loader : DataLoader, hyperparameter : Di
             print("[Over Patience, Training Over ! ]") 
             print(f"[ Best Epoch : {best_epoch} ]")
             print(f"[ Best Loss : {bestVal_loss} ]")
-            
+
             # CSV / 로그 저장
             best_csv_path = "best_" + csv_path
             file_exists = os.path.exists(best_csv_path)
