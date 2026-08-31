@@ -10,8 +10,8 @@ momentum: 0.9         # SGD Optimizer Momentum(기준 : 0.9)
 weight_decay: 0.0     # L2 Regularization (가중치 감쇠)(기준 : 0.0)
 epochs: 30            # 전체 학습 에폭 수(기준 : 30)
 dropout : 0.0         # (기준 : 0.0)
-scheduler : "none"    # (기준 : none)
-augmentation : "none" # (기준 : none)
+scheduler : "none"    # 스케줄러 : 학습이 진행됨에 따라 학습률(Learning Rate, LR)을 자동으로 조정(기준 : none)
+augmentation : "none" # 데이터 증강(기준 : none)
 
 
 # [모델 및 데이터 관련 설정]

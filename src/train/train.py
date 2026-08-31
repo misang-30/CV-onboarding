@@ -19,8 +19,8 @@ from torch.optim.lr_scheduler import CosineAnnealingLR
 
 def train (train_loader :DataLoader,val_loader : DataLoader, hyperparameter : Dict[str, Any], csv_path : str = "training_log.csv", wandbOn: bool =True) :
 
-    torch.use_deterministic_algorithms(True) # 결과 통제
-    
+
+
     # ================== 모델 학습 ==================
 
     # nn.Module을 상속받아 만든 모델은 정의된 모든 레이어의 가중치를 자동으로 추적합니다. 
