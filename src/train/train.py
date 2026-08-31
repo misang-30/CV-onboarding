@@ -202,7 +202,8 @@ if __name__ == "__main__" :
     config = hyperparameter
 
     run_name = (
-        f"base_w{hyperparameter['width']}"
+        f"{hyperparameter['concept']}"
+        f"_w{hyperparameter['width']}"
         f"_lr{hyperparameter['lr']}"
         f"_bat{hyperparameter['batch_size']}"
         f"_ep{hyperparameter['epochs']}"
