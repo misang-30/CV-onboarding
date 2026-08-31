@@ -200,14 +200,59 @@ if __name__ == "__main__" :
     # 실험 이름과 하이퍼 파리미터 받는다.
     hyperparameter = get_hyperparameter() # depends on "baseline.yaml"
     config = hyperparameter
+    
+    if hyperparameter['concept'] == 'train' :
+        run_name = (
+            f"{hyperparameter['concept']}"
+            f"_tr{hyperparameter['train_num']}"
+            f"_w{hyperparameter['width']}"
+            f"_lr{hyperparameter['lr']}"
 
-    run_name = (
-        f"{hyperparameter['concept']}"
-        f"_w{hyperparameter['width']}"
-        f"_lr{hyperparameter['lr']}"
-        f"_bat{hyperparameter['batch_size']}"
-        f"_ep{hyperparameter['epochs']}"
-    )
+        )
+
+    elif hyperparameter['concept'] == 'augmentation' :
+        run_name = (
+            f"{hyperparameter['concept']}"
+            f"_aug{hyperparameter['augmentation']}"
+            f"_w{hyperparameter['width']}"
+            f"_lr{hyperparameter['lr']}"
+
+        )
+
+    elif hyperparameter['concept'] == 'weight decay' :
+        run_name = (
+            f"{hyperparameter['concept']}"
+            f"_decay{hyperparameter['weight_decay']}"
+            f"_w{hyperparameter['width']}"
+            f"_lr{hyperparameter['lr']}"
+
+        )
+    elif hyperparameter['concept'] == 'scheduler' :
+        run_name = (
+            f"{hyperparameter['concept']}"
+            f"_schd{hyperparameter['scheduler']}"
+            f"_w{hyperparameter['width']}"
+            f"_lr{hyperparameter['lr']}"
+
+        )
+    elif hyperparameter['concept'] == 'dropout' :
+        run_name = (
+            f"{hyperparameter['concept']}"
+            f"_drop{hyperparameter['dropout']}"
+            f"_w{hyperparameter['width']}"
+            f"_lr{hyperparameter['lr']}"
+
+        )
+
+
+    else :   
+        run_name = (
+            f"{hyperparameter['concept']}"
+            f"_w{hyperparameter['width']}"
+            f"_lr{hyperparameter['lr']}"
+            f"_ep{hyperparameter['epochs']}"
+
+        )
 
     # train 시작 
     set_seed(hyperparameter['seed'])
