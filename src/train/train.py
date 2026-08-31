@@ -36,16 +36,16 @@ def train (train_loader :DataLoader,val_loader : DataLoader, hyperparameter : Di
     criterion = nn.CrossEntropyLoss() # 손실함수 정의 (분류 문제)
     optimizer = torch.optim.SGD( # 옵티마이저 정의
         model.parameters(), 
-        lr= hyperparameter["lr"], 
-        momentum= hyperparameter["momentum"], 
-        weight_decay=hyperparameter["weight_decay"]
+        lr = hyperparameter["lr"], 
+        momentum = hyperparameter["momentum"], 
+        weight_decay = float(hyperparameter["weight_decay"])
     ) # 옵티마이저 정의
 
     # YAML의 scheduler 값에 따라 스케줄러 생성
     scheduler_type = hyperparameter['scheduler']
 
     if scheduler_type == "cosine":
-        scheduler = CosineAnnealingLR(optimizer, T_max=config['training']['epochs'])
+        scheduler = CosineAnnealingLR(optimizer, T_max=hyperparameter["epochs"])
     elif scheduler_type == "none":
         scheduler = None
     else:
@@ -113,7 +113,7 @@ def train (train_loader :DataLoader,val_loader : DataLoader, hyperparameter : Di
         epoch_train_acc = train_correct / len(train_loader.dataset) # 평균 정확도 계산     
         print(f"Epoch [{epoch}/{hyperparameter['epochs']}], Train Loss: {epoch_train_loss:.4f}, Train Acc: {epoch_train_acc:.4f}")
 
-
+        
 
         # ---------- validate ----------
 
@@ -139,6 +139,12 @@ def train (train_loader :DataLoader,val_loader : DataLoader, hyperparameter : Di
         epoch_val_acc = val_correct / len(val_loader.dataset) # 평균 정확도 계산
         print(f"Epoch [{epoch}/{hyperparameter['epochs']}], Val Loss: {epoch_val_loss:.4f}, Val Acc: {epoch_val_acc:.4f}")
 
+        # ---------- 스케줄러 단계 업데이트 ----------
+        if scheduler is not None:
+            scheduler.step()
+
+        # 현재 적용된 실제 학습률 가져오기
+        current_lr = optimizer.param_groups[0]['lr']
 
 
         # ---------- 기록 ----------
@@ -147,7 +153,7 @@ def train (train_loader :DataLoader,val_loader : DataLoader, hyperparameter : Di
             writer = csv.writer(f)
             writer.writerow([
                 epoch,
-                hyperparameter["lr"],
+                current_lr,
                 round(epoch_train_loss, 4),
                 round(epoch_train_acc, 4),
                 round(epoch_val_loss, 4),
@@ -155,7 +161,7 @@ def train (train_loader :DataLoader,val_loader : DataLoader, hyperparameter : Di
             ])
         if wandbOn :
             wandb.log({"epoch": epoch, "train/loss": epoch_train_loss, "train/acc": epoch_train_acc,
-            "val/loss": epoch_val_loss, "val/acc": epoch_val_acc, "lr": hyperparameter["lr"]})    
+            "val/loss": epoch_val_loss, "val/acc": epoch_val_acc, "lr": current_lr})    
 
         # 8) 콘솔에도 한 줄 출력
         print(f"Epoch [{epoch}/{hyperparameter['epochs']}] 저장 완료!")
@@ -219,10 +225,10 @@ if __name__ == "__main__" :
 
         )
 
-    elif hyperparameter['concept'] == 'weight decay' :
+    elif hyperparameter['concept'] == 'weight_decay' :
         run_name = (
             f"{hyperparameter['concept']}"
-            f"_decay{hyperparameter['weight_decay']}"
+            f"{hyperparameter['weight_decay']}"
             f"_w{hyperparameter['width']}"
             f"_lr{hyperparameter['lr']}"
 
@@ -230,7 +236,7 @@ if __name__ == "__main__" :
     elif hyperparameter['concept'] == 'scheduler' :
         run_name = (
             f"{hyperparameter['concept']}"
-            f"_schd{hyperparameter['scheduler']}"
+            f"_{hyperparameter['scheduler']}"
             f"_w{hyperparameter['width']}"
             f"_lr{hyperparameter['lr']}"
 
@@ -238,12 +244,19 @@ if __name__ == "__main__" :
     elif hyperparameter['concept'] == 'dropout' :
         run_name = (
             f"{hyperparameter['concept']}"
-            f"_drop{hyperparameter['dropout']}"
+            f"_{hyperparameter['dropout']}"
             f"_w{hyperparameter['width']}"
             f"_lr{hyperparameter['lr']}"
 
         )
+    elif hyperparameter['concept'] == 'batch_size' :
+        run_name = (
+            f"{hyperparameter['concept']}"
+            f"_{hyperparameter['batch_size']}"
+            f"_w{hyperparameter['width']}"
+            f"_lr{hyperparameter['lr']}"
 
+        )
 
     else :   
         run_name = (

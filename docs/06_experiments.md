@@ -161,10 +161,50 @@
 
 ## 5. 실험 관리 도구
 - Wandb Ai 툴
-- https://wandb.ai/rogong7428-kwangwoon-university/cifar10-onboarding/overview
+- https://wandb.ai/rogong7428-kwangwoon-university/cifar10-onboarding/workspace?nw=nwuserrogong7428
 
 ---
 ## 6.  통제 실험
+
+
+> [ baseline ]
+	lr: 0.005             
+	momentum: 0.9         
+	weight_decay: 0.0    
+	epochs: 30          
+	dropout : 0.0        
+	scheduler : "none"    
+	augmentation : "none" 
+	width: 32            
+	batch_size: 128    
+	seed: 42       
+	train_num : 45000   
+	val_num : 5000    
+
+- best epoch는 best loss를 기준으로 한다.
+
+| #   | run 이름                                       | 바꾼 것          | best val acc | best epoch | 소요     | 해석 (한 줄)                       |
+| --- | -------------------------------------------- | ------------- | ------------ | ---------- | ------ | ------------------------------ |
+| 0   | `base_w32_lr0.005_ep30`                      | baseline      | 80.1%        | 12         | 99초    | 12 epoch부터 val loss 상승, 과적합 시작 |
+| 1   | `train_tr500_w32_lr0.005`                    | train 500개    | 41.7%        | 19         | 14.66초 | ...                            |
+| 2   | `train_tr2000_w32_lr0.005`                   | train 2000개   | 50.8%        | 12         | 14.68초 | ...                            |
+| 3   | `train_tr10000_w32_lr0.005`                  | train 10000개  | 63.1%        | 6          | 22.59초 | ...                            |
+| 4   | `train_tr45000_w32_lr0.005`<br>(base)        | train 45000개  | 80.5%        | 14         | 108.1초 | ...                            |
+| 5   | `width_w16_lr0.005_ep30`                     | width 16      |              |            |        |                                |
+| 6   | `width_w32_lr0.005_ep30`<br>(base)           | width 32      |              |            |        |                                |
+| 7   | `width_w64_lr0.005_ep30`                     | width 64      |              |            |        |                                |
+| 8   | `augmentation_augnone_w_lr`<br>(base)        | aug none      |              |            |        |                                |
+| 9   | `augmentation_augcrop_w_lr`                  | aug crop      |              |            |        |                                |
+| 10  | `augmentation_augcrop_flip_w_lr`             | aug crop_flip |              |            |        |                                |
+| 11  | `weightdecay_decay0.0_w32_lr0.005`<br>(base) | decay 0.0     |              |            |        |                                |
+| 12  | `weightdecay_decay1e-4_w32_lr0.005`<br>      | decay 1e-4    |              |            |        |                                |
+| 13  | `weightdecay_decay5e-4_w32_lr0.005`<br>      | decay 5e-4    |              |            |        |                                |
+| 14  | `weightdecay_decay5e-3_w32_lr0.005`<br>      | decay 5e-3    |              |            |        |                                |
+| 15  |                                              |               |              |            |        |                                |
+| 16  |                                              |               |              |            |        |                                |
+| 17  |                                              |               |              |            |        |                                |
+| 18  |                                              |               |              |            |        |                                |
+|     |                                              |               |              |            |        |                                |
 
 
 
