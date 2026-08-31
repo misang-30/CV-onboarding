@@ -161,7 +161,7 @@
 
 ## 5. 실험 관리 도구
 - Wandb Ai 툴
-- 
+- https://wandb.ai/rogong7428-kwangwoon-university/cifar10-onboarding/overview
 
 ---
 ## 6.  통제 실험

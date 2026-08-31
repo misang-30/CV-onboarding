@@ -10,7 +10,7 @@ from torch.utils.data import random_split, DataLoader
 from typing import Dict, Any
 
 
-hyperparameter = {}
+hyperparameter = {} # 내부 전역 변수
 
 def show_hyperparameter() : 
 	print("<< Hyperparameter Status >> ")
@@ -24,7 +24,11 @@ def show_hyperparameter() :
 		hyperparameter ["train_num"],
 		hyperparameter ["val_num"],
 		hyperparameter ["width"],
-		hyperparameter ["seed"]
+		hyperparameter ["seed"],
+		hyperparameter ["dropout"],
+		hyperparameter ["scheduler"],
+		hyperparameter ["augmentation"]
+		
 	)
 
 
@@ -50,14 +54,40 @@ def set_seed(seed: int):
     torch.manual_seed(seed)
     torch.cuda.manual_seed_all(seed)
 
+def build_transforms(aug_type):
+    transform_list = []
+    
+    # YAML의 augmentation 값에 따라 분기
+    if aug_type == "random_crop":
+        transform_list.append(transforms.RandomCrop(32, padding=4))
+    elif aug_type == "horizontal_flip":
+        transform_list.append(transforms.RandomCrop(32, padding=4))
+        transform_list.append(transforms.RandomHorizontalFlip())
+    elif aug_type == "none":
+        pass
+    else:
+        raise ValueError(f"Unknown augmentation option: {aug_type}")
+
+
+    # 기본 필수 변환
+    transform_list.extend([
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
+    ])
+    
+    return transforms.Compose(transform_list)
+
+
 
 def get_dataloaders (): 
 	# ================== 학습 환경 설정 ==================
+
+	if not hyperparameter : 
+		get_hyperparameter
+
 	# 1). 데이터셋 불러오기 (CIFAR10 :  텐서변환, 정규화)
-	norm_transform = transforms.Compose([
-		transforms.ToTensor(),
-		transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
-	])
+	norm_transform = build_transforms(hyperparameter["augmentation"])
+      
 	train_full = datasets.CIFAR10(
 		root="./data", 
 		train=True,  

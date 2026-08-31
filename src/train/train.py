@@ -13,15 +13,14 @@ from data  import set_seed
 from torch.utils.data import DataLoader
 from typing import Dict, Any
 from plot_curves import plot
-
+from torch.optim.lr_scheduler import CosineAnnealingLR
 
 
 
 def train (train_loader :DataLoader,val_loader : DataLoader, hyperparameter : Dict[str, Any], csv_path : str = "training_log.csv", wandbOn: bool =True) :
 
-    # hyperparameter 읽어오기.
+    torch.use_deterministic_algorithms(True) # 결과 통제
     
-
     # ================== 모델 학습 ==================
 
     # nn.Module을 상속받아 만든 모델은 정의된 모든 레이어의 가중치를 자동으로 추적합니다. 
@@ -33,7 +32,7 @@ def train (train_loader :DataLoader,val_loader : DataLoader, hyperparameter : Di
     print(f"Train Start ! , Width = {hyperparameter['width']}")
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu") # GPU 세팅
 
-    model = SmallCNN(width=hyperparameter["width"], dropout_p=0).to(device) # 모델 생성
+    model = SmallCNN(width=hyperparameter["width"], dropout_p=hyperparameter["dropout"]).to(device) # 모델 생성
     criterion = nn.CrossEntropyLoss() # 손실함수 정의 (분류 문제)
     optimizer = torch.optim.SGD( # 옵티마이저 정의
         model.parameters(), 
@@ -41,6 +40,16 @@ def train (train_loader :DataLoader,val_loader : DataLoader, hyperparameter : Di
         momentum= hyperparameter["momentum"], 
         weight_decay=hyperparameter["weight_decay"]
     ) # 옵티마이저 정의
+
+    # YAML의 scheduler 값에 따라 스케줄러 생성
+    scheduler_type = hyperparameter['scheduler']
+
+    if scheduler_type == "cosine":
+        scheduler = CosineAnnealingLR(optimizer, T_max=config['training']['epochs'])
+    elif scheduler_type == "none":
+        scheduler = None
+    else:
+        raise ValueError(f"Unknown scheduler option: {scheduler_type}")
 
     # print(model) # 모델 구조 확인 가능
 
