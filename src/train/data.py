@@ -58,9 +58,9 @@ def build_transforms(aug_type):
     transform_list = []
     
     # YAML의 augmentation 값에 따라 분기
-    if aug_type == "random_crop":
+    if aug_type == "crop":
         transform_list.append(transforms.RandomCrop(32, padding=4))
-    elif aug_type == "horizontal_flip":
+    elif aug_type == "crop_flip":
         transform_list.append(transforms.RandomCrop(32, padding=4))
         transform_list.append(transforms.RandomHorizontalFlip())
     elif aug_type == "none":
