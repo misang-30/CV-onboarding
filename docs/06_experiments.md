@@ -52,16 +52,18 @@
     print(sum(p.numel() for p in model.parameters() if p.requires_grad))
 ```
 
-> [결과]
->  1). width 16
+```
+[결과]
+1). width 16
 	torch.Size([2, 10])
 	73178
->2). width 32
+2). width 32
 	torch.Size([2, 10])
 	289194
-  3).width 64
+3).width 64
 	torch.Size([2, 10])
 	1149770
+```
 
 | Width      | 파라미터 수  | 증가율 (width 16 기준) |
 | ---------- | ------- | ----------------- |
@@ -72,6 +74,8 @@
 
 ### 2). 각 블록별 텐서 차원 변화
 
+
+```
 > [Block 1]
 > 컨볼루션 층  : 입력 3 x 32 x 32 > 필터 C x 3 x 3 x 3 > 출력 C x 32 x 32
 > 컨볼루션 층  : 입력 C x 32 x 32 > 필터 C x 3 x 3 x 3 > 출력 C x 32 x 32
@@ -94,10 +98,13 @@
 > Width를 C라 할때 컨볼루션 층의 파라미터 개수는 C^2이 지배적이므로 
 > Width가 2배 커질 때 파라미터 개수는 4배씩 커진다.
 
-
+```
 
 ---
 ## 3. 학습 루프 구현 
+
+
+```
 
 > [Hyperparameter]
 > width 32
@@ -110,11 +117,15 @@
 >  momentum = 0.9
 >  dropout = 0
 
+```
+
 
 ![](../img/train_plt2.png)
 
+```
 > Val accuracy는 최소 70% 이상 나온다.
 > baseline 30 epoch이 5분 이내로 끝난다
+```
 
 
 
@@ -122,6 +133,8 @@
 
 
 ## 4.  과적합 제조 실험
+
+```
 
 > [Hyperparameter]
 >  trainData 500 
@@ -131,7 +144,13 @@
 >  width 64
 >  learning rate  0.005 
 
+
+```
+
+
 ![](../img/overfitting_plot2.png)
+
+```
 
 > [ 분석 ]
 > 1.100 epoch이 2분 안에 끝났다.
@@ -141,6 +160,9 @@
 > 5.val loss가 epoch 37에서 1.6825로 최저점을 찍고 다시 올라간다.
 > 6.val acc가 epoch 87, 96에서 0.4690으로 최고 점을 찍는다.
 > 7.Loss를 기준으로 Best Epoch를 잡는 것이 과적합 시점을 잡는데 유용할 것으로 판단된다.
+
+```
+
 
 ### 1). 왜  val loss와 val accuracy가 어긋나는가?
 - CrossEntropy는 틀린 정도를 반영하지만 accuracy는 맞았는지만 반영한다.
@@ -168,6 +190,7 @@
 ### 0). 실험 데이터
 
 
+```
 > [ baseline ]
 	lr: 0.005             
 	momentum: 0.9         
@@ -181,6 +204,9 @@
 	seed: 42       
 	train_num : 45000   
 	val_num : 5000    
+
+```
+
 
 - early stop에 의해 소요 시간이 일관되지 않다.
 - 아래 실험은 한 요소만 바꾸면서 진행하였다.
