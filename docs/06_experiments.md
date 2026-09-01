@@ -219,51 +219,62 @@
 
 
 ### 1). train 데이터 수
-- 어떤 차이가 있었는가?
-- 값의 차이에 따른 결과를 보고 왜 그렇게 되는건지 분석 필요.
+	- 500개: Best Val Acc **41.7%** (Best Ep 19)
+	- 2,000개: Best Val Acc **50.8%** (Best Ep 12)
+	- 10,000개: Best Val Acc **63.1%** (Best Ep 6)
+	- 45,000개: Best Val Acc **80.5%** (Best Ep 12)
+- 데이터수와 과적합 :  데이터가 적은 경우, 모델이 쉽게 과적합 되고, 일반화 성능이 떨어진다.
+- Best Epoch 변화 : 데이터가 적을 수록 일찍 과적합되는 것 처럼 보이나 500개처럼 아예 작을 때는 local Minimam에 갇혀 천천히 상승하다 과적합되는 양상을 보인다.
 
 ### 2). width
-- 어떤 차이가 있었는가?
-- 값의 차이에 따른 결과를 보고 왜 그렇게 되는건지 분석 필요.
+	- Width 16: Best Val Acc **78.3%** (Best Ep 19, 소요시간 83초)
+	- Width 32 (Base): Best Val Acc **78.9%** (Best Ep 12, 소요시간 100초)
+	- Width 64: Best Val Acc **86.28%** (Best Ep 22, 소요시간 224.5초)
+- 모델 파라미터 : Width가 커질때마다 Conv 채널 수가 증가하여 모델의 복잡도가 기하급수적으로 늘어난다.
+- Width 64로 늘렸을 때 성능이 86.28%까지 상승하였으며, 대신 학습 시간이 2배 이상 증가하였다. 반면 Width 16/32은 과소 적합이라 볼 수 있다.
 
 ### 3). augmentation
-- 어떤 차이가 있었는가?
-- 값의 차이에 따른 결과를 보고 왜 그렇게 되는건지 분석 필요.
-
+	- None (Base): Best Val Acc **79.6%** (Best Ep 7)
+	- Crop: Best Val Acc **83.32%** (Best Ep 21)
+	- Crop + Flip: Best Val Acc **85.18%** (Best Ep 29)
+- Augmentation이 없을 때는 7 epoch 만에 과적합이 시작되어 수렴이 멈췄으나, Crop + Flip을 적용하자 27 epoch 까지 과적합 없이 지속적으로 학습을 하여 최고 성능을 보였다. 
 
 ### 4). weight decay
-- 어떤 차이가 있었는가?
-- 값의 차이에 따른 결과를 보고 왜 그렇게 되는건지 분석 필요.
-
+	- Decay 0.0 (Base): Best Val Acc **79.42%** (Best Ep 11)
+	- Decay 1e-4: Best Val Acc **81.48%** (Best Ep 15)
+	- Decay 5e-4: Best Val Acc **79.2%** (Best Ep 9)
+	- Decay 5e-3: Best Val Acc **79.1%** (Best Ep 13)
+- Weight Decay 1e-4 에서 가장 높은 성능을 기록하였으며, 그 이상의 값에서는 언더피팅 경향이 생겨 Early Stopping 더 일찍 걸리며 성능이 하락했다.
 ### 5). dropout
+	- Dropout 0.0 (Base): Best Val Acc **81.1%** (Best Ep 15)
+	- Dropout 0.3: Best Val Acc **79.6%** (Best Ep 14)
+	- Dropout 0.5: Best Val Acc **79.4%** (Best Ep 9)
 
-- 어떤 차이가 있었는가?
-- 값의 차이에 따른 결과를 보고 왜 그렇게 되는건지 분석 필요.
+- Dropout이 커짐에 따라 성능 또한 하락하였다.
+- Dropout의 크기가 과도하게 커 정보가 과도하게 삭제되었다.
+
 ### 6). learning rate
-- 어떤 차이가 있었는가?
-- 값의 차이에 따른 결과를 보고 왜 그렇게 되는건지 분석 필요.
-
+	- LR 0.5: Best Val Acc **79.0%** (Best Ep 15)
+	- LR 0.05: Best Val Acc **83.0%** (Best Ep 9)
+	- LR 0.005 (Base): Best Val Acc **81.2%** (Best Ep 14)
+	- LR 0.0005: Best Val Acc **76.1%** (Best Ep 30, Early Stop 미발생)
+- LR 0.05에서 최적의 학습률을 기록했다.
+- LR 0.0005에서는 Early Stop이 미발생한 것으로 미루어보아 학습률이 너무 작아 30 epoch 내에 최적점에 도달하지 못한 것으로 보인다.
 ### 7). scheduler
-- 어떤 차이가 있었는가?
-- 값의 차이에 따른 결과를 보고 왜 그렇게 되는건지 분석 필요.
-
+	- None (Base): Best Val Acc **80.2%** (Best Ep 7)
+	- CosineAnnealingLR: Best Val Acc **82.8%** (Best Ep 21)
+- Scheduler는 학습 초반에는 큰 학습률로 최적점에 빠르게 이동하고 , 후반부로 갈수록 lr을 줄여 최적점에 근사한 위치에 이동한다.
 ### 8). batch size
-- 어떤 차이가 있었는가?
-- 값의 차이에 따른 결과를 보고 왜 그렇게 되는건지 분석 필요.
+	- Batch 32: Best Val Acc **83.1%** (Best Ep 10, 소요시간 147.5초)
+	- Batch 128 (Base): Best Val Acc **80.2%** (Best Ep 7, 소요시간 77.4초)
+	- Batch 512: Best Val Acc **76.6%** (Best Ep 18, 소요시간 122.1초)
 
-## 3. 통제 실험 주요 관찰 포인트 및 해석 가이드
+- Batch 32 에서 가장 높은 성능을 기록하였다. Batch 사이즈가 작은 경우에는 데이터셋의 평균 범주에서 많이 벗어나는 값의 영향을 쉽게 받아서 가중치 업데이트시에 노이즈 역할을 한다. 이 노이즈 loss에 진동을 주어 local minima를 탈출하는데 도움을 준다. 
 
-실험 후 `docs/06-experiments.md` 작성 시 각 항목별로 아래 포인트들을 관찰하고 해석 한 줄을 남겨보세요.
+- 반면 Batch 512에서는 가장 낮은 성능을 보였다. batch 사이즈가 클 수록 앞서 말한 노이즈의 역할을 하지 못해 local minima에 갇힐 수 있다. 이로 인해 낮은 성능을 기록한다.
 
-| **실험 항목**                           | **관찰해야 할 지점**                       | **예상되는 현상 및 한 줄 해석 예시**                                                     |
-| ----------------------------------- | ----------------------------------- | --------------------------------------------------------------------------- |
-| **1. Train 크기** (500 vs 45,000)     | Train-Val 간의 격차(Generalization Gap) | _"데이터 수가 늘수록 과적합(Gap)이 줄어들고 Val Loss 바닥 지점이 뒤로 밀림."_                        |
-| **2. Model Width** (16 vs 64)       | 모델 용량(Capacity)에 따른 수렴 속도와 과적합      | _"Width가 클수록 표현력이 커져 Train Loss는 빠르게 0에 도달하나, 정규화 없이는 Val Loss가 더 빨리 상향함."_ |
-| **3. Augmentation** (Crop/Flip)     | Train Acc의 상승 속도 및 Val Gap          | _"Data Augmentation 적용 시 Train Acc 상승은 더뎌지나 일반화 성능이 향상되어 Val Acc 최고점이 오름."_ |
-| **4. Weight Decay** (0 vs 5e-3)     | 파라미터 규제 세기                          | _"Weight Decay가 너무 크면 모델이 अंडर피팅(Underfitting)되고, 적절하면 Overfitting을 지연시킴."_ |
-| **5. Dropout** (0.0 vs 0.3)         | Feature 마스킹 효과                      | _"Head 직전 Dropout은 Augmentation 대비 효과가 제한적이었지만, Train-Val 간격 축소에 기여함."_     |
-| **6. Learning Rate** (0.5 ~ 0.0005) | Loss 곡선의 발산/진동/완만한 하락               | _"LR이 너무 크면(0.5) Loss가 발산하거나 진동하며, 너무 작으면(0.0005) 100 epoch 내에 수렴하지 못함."_   |
-| **7. Scheduler** (CosineAnnealing)  | 평평해진 Loss의 2차 하락                    | _"Loss가 평평해진 시점에 LR을 줄여주자 local minima 근처에서 한 번 더 떨어지며 성능 향상."_             |
+- 가장 효과적이었던 기법: Width 확장(64, 86.28%)과 Data Augmentation (Crop+Flip, 85.18%)
+
 
 ---
 ## 7. 함정 체험
