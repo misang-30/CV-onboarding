@@ -289,6 +289,9 @@
 
 - img / lr4graph.png
 ![](../img/lr4graph.png)
+- img / lrvalloss.png
+![](../img/lrvalloss.png)
+
 
 ### 7). scheduler
 	- None (Base): Best Val Acc **80.2%** (Best Ep 7)
