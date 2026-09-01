@@ -181,30 +181,38 @@
 	train_num : 45000   
 	val_num : 5000    
 
-- best epoch는 best loss를 기준으로 한다.
+- early stop에 의해 소요 시간이 일관되지 않다.
 
-| #   | run 이름                                       | 바꾼 것          | best val acc | best epoch | 소요     | 해석 (한 줄)                       |
-| --- | -------------------------------------------- | ------------- | ------------ | ---------- | ------ | ------------------------------ |
-| 0   | `base_w32_lr0.005_ep30`                      | baseline      | 80.1%        | 12         | 99초    | 12 epoch부터 val loss 상승, 과적합 시작 |
-| 1   | `train_tr500_w32_lr0.005`                    | train 500개    | 41.7%        | 19         | 14.66초 | ...                            |
-| 2   | `train_tr2000_w32_lr0.005`                   | train 2000개   | 50.8%        | 12         | 14.68초 | ...                            |
-| 3   | `train_tr10000_w32_lr0.005`                  | train 10000개  | 63.1%        | 6          | 22.59초 | ...                            |
-| 4   | `train_tr45000_w32_lr0.005`<br>(base)        | train 45000개  | 80.5%        | 14         | 108.1초 | ...                            |
-| 5   | `width_w16_lr0.005_ep30`                     | width 16      |              |            |        |                                |
-| 6   | `width_w32_lr0.005_ep30`<br>(base)           | width 32      |              |            |        |                                |
-| 7   | `width_w64_lr0.005_ep30`                     | width 64      |              |            |        |                                |
-| 8   | `augmentation_augnone_w_lr`<br>(base)        | aug none      |              |            |        |                                |
-| 9   | `augmentation_augcrop_w_lr`                  | aug crop      |              |            |        |                                |
-| 10  | `augmentation_augcrop_flip_w_lr`             | aug crop_flip |              |            |        |                                |
-| 11  | `weightdecay_decay0.0_w32_lr0.005`<br>(base) | decay 0.0     |              |            |        |                                |
-| 12  | `weightdecay_decay1e-4_w32_lr0.005`<br>      | decay 1e-4    |              |            |        |                                |
-| 13  | `weightdecay_decay5e-4_w32_lr0.005`<br>      | decay 5e-4    |              |            |        |                                |
-| 14  | `weightdecay_decay5e-3_w32_lr0.005`<br>      | decay 5e-3    |              |            |        |                                |
-| 15  |                                              |               |              |            |        |                                |
-| 16  |                                              |               |              |            |        |                                |
-| 17  |                                              |               |              |            |        |                                |
-| 18  |                                              |               |              |            |        |                                |
-|     |                                              |               |              |            |        |                                |
+| #   | run 이름                                       | 바꾼 것                | best val acc | best<br>loss <br>epoch | 소요     | 해석 (한 줄)                       |
+| --- | -------------------------------------------- | ------------------- | ------------ | ---------------------- | ------ | ------------------------------ |
+| 0   | `base_w32_lr0.005_ep30`                      | baseline            | 80.1%        | 12                     | 99초    | 12 epoch부터 val loss 상승, 과적합 시작 |
+| 1   | `train_tr500_w32_lr0.005`                    | train 500개          | 41.7%        | 19                     | 14.66초 | ...                            |
+| 2   | `train_tr2000_w32_lr0.005`                   | train 2000개         | 50.8%        | 12                     | 14.68초 | ...                            |
+| 3   | `train_tr10000_w32_lr0.005`                  | train 10000개        | 63.1%        | 6                      | 22.59초 | ...                            |
+| 4   | `train_tr45000_w32_lr0.005`<br>(base)        | train 45000개        | 80.5%        | 14                     | 108.1초 | ...                            |
+| 5   | `width_w16_lr0.005_ep30`                     | width 16            | 78.3%        | 19                     | 83초    |                                |
+| 6   | `width_w32_lr0.005_ep30`<br>(base)           | width 32            | 78.9%        | 12                     | 100초   |                                |
+| 7   | `width_w64_lr0.005_ep30`                     | width 64            | 86.28%       | 22                     | 224.5초 |                                |
+| 8   | `augmentation_augnone_w_lr`<br>(base)        | aug none            | 79.6%        | 7                      | 76.6초  |                                |
+| 9   | `augmentation_augcrop_w_lr`                  | aug crop            | 83.32%       | 21                     | 137.6초 |                                |
+| 10  | `augmentation_augcrop_flip_w_lr`             | aug crop_flip       | 85.18%       | 29                     | 141초   |                                |
+| 11  | `weightdecay_decay0.0_w32_lr0.005`<br>(base) | decay 0.0           | 79.42%       | 11                     | 93.6초  |                                |
+| 12  | `weightdecay_decay1e-4_w32_lr0.005`<br>      | decay 1e-4          | 81.48%       | 15                     | 111.9초 |                                |
+| 13  | `weightdecay_decay5e-4_w32_lr0.005`<br>      | decay 5e-4          | 79.2%        | 9                      | 86.3초  |                                |
+| 14  | `weightdecay_decay5e-3_w32_lr0.005`<br>      | decay 5e-3          | 79.1%        | 13                     | 103.8초 |                                |
+| 15  | `dropout_0.0_w32_lr0.005`                    | dropout<br>0.0      | 81.1%        | 15                     | 112.5초 |                                |
+| 16  | `dropout_0.3_w32_lr0.005`                    | dropout<br>0.3      | 79.6%        | 14                     | 109.3초 |                                |
+| 17  | `dropout_0.5_w32_lr0.005`                    | dropout<br>0.5      | 79.4%        | 9                      | 86.2초  |                                |
+| 18  | `lr_w32_lr0.5_ep30`                          | lr 0.5              | 79%          | 15                     | 113.4초 |                                |
+| 19  | `lr_w32_lr0.05_ep30`                         | lr 0.05             | 83%          | 9                      | 88초    |                                |
+| 20  | `lr_w32_lr0.005_ep30`                        | lr 0.005            | 81.2%        | 14                     | 109.3초 |                                |
+| 21  | `lr_w32_lr0.0005_ep30`                       | lr 0.0005           | 76.1%        | 30                     | 138.9초 |                                |
+| 22  | `scheduler_none_w32_lr0.005`                 | scheduler <br>none  | 80.2%        | 7                      | 78.7초  |                                |
+| 23  | `scheduler_cosine_w32_lr0.005`               | scheduler<br>cosine | 82.8%        | 21                     | 135.8초 |                                |
+| 24  | `batch_size_32_w32_lr0.005`                  | batch<br>32         | 83.1%        | 10                     | 147.5초 |                                |
+| 25  | `batch_size_128_w32_lr0.005`                 | batch<br>128        | 80.2%        | 7                      | 77.4초  |                                |
+| 26  | `batch_size_512_w32_lr0.005`                 | batch<br>512        | 76.6%        | 18                     | 122.1초 |                                |
+
 
 
 
