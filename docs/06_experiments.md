@@ -286,6 +286,10 @@
 	- LR 0.0005: Best Val Acc **76.1%** (Best Ep 30, Early Stop 미발생)
 - LR 0.05에서 최적의 학습률을 기록했다.
 - LR 0.0005에서는 Early Stop이 미발생한 것으로 미루어보아 학습률이 너무 작아 30 epoch 내에 최적점에 도달하지 못한 것으로 보인다.
+
+- img / lr4graph.png
+![](../img/lr4graph.png)
+
 ### 7). scheduler
 	- None (Base): Best Val Acc **80.2%** (Best Ep 7)
 	- CosineAnnealingLR: Best Val Acc **82.8%** (Best Ep 21)
