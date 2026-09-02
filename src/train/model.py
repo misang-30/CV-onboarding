@@ -53,9 +53,6 @@ class SmallCNN ( nn.Module) :
         x = self.head(x)
         return x
 
-    def predict(self, x : torch.Tensor) : 
-        # not yet implemented
-        print("not yet implemented")
 
 
 
