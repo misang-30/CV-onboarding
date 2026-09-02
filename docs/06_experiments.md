@@ -312,3 +312,44 @@
 ---
 ## 7. 함정 체험
 
+### 1). 실험 A 
+- 같은 하이퍼파라미터 설정 다른 3개의 Seed 비교
+
+``` 
+- seed 0 : best val acc = 79.84%
+- seed 1 : best val acc = 77.08%
+- seed 2 : best val acc = 80.6 %
+
+```
+
+- 평균 : 79.173%
+- 표준편차 : 1.85%
+- 현재 모델/데이터셋 환경이 가중치 초기화나 데이터 셔플링 같은 초기 난수 설정에 매우 민감하다고 볼 수 있다.
+- 따라서 1.85%p 이하의 단순 Accuracy 상승은 성능 개선이 아닌 난수 변동에 의한 오차 범주 내의 결과로 판단하며, 이보다 큰 상승이 있을 때만 유의미한 개선으로 판단한다.
+
+
+
+### 2). 실험 B 
+- 잘못된 Split을 만들어 데이터 누수 확인.
+
+``` dataleak.py
+
+[Proper]
+Best Val Loss (epoch 12) : 1.5
+Best Val Acc (epoch 11) : 48%
+Test Loss: 3.3514, Test Accuracy: 25.08%
+
+
+
+[Wrong]
+Best Val Loss (epoch 30) : 0.51
+Best Val Acc (epoch 30) : 82.66%
+Test Loss: 3.6378, Test Accuracy: 24.20%
+
+```
+- Wrong Val 데이터셋에는 Train에서 사용된 데이터셋의 복제본이 있으므로,
+- Wrong 방식의 경우 Val 데이터셋에 과적합되어 있어 82.66%의 높은 Acc를 보이는 반면 Proper 방식은 48%의 낮은 Acc를 갖는다.
+- 이는 Wrong 방식의 Val 데이터셋 일반화 성능 검증 효용성이 없음을 의미한다.
+- Test 데이터셋을 이용한 성능 평가 역시 이를 보여준다.
+
+### 3). 실험 C

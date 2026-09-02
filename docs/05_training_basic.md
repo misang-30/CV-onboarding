@@ -17,250 +17,358 @@ wandb/
 > test set은 Day 5에 최초 1회만 열었습니다.
 > 그 이전의 모든 판단은 val set만으로 내렸습니다.
 
-### 1). CIFAR10 다운로드
-
-
-```bash
-conda activate pytorch_env
-pip install matplotlib pyyaml
-pip install torch torchvision
-```
-### 2). 이미지 격자 
-
-![](../img/cifar10_samples.png)
-
-### 3).  텐서 변환, 정규화, split
-
-- CIFAR-10 이미지는 transform 없이 가져오면 class 'PIL.Image.Image' 이런 식이다. 즉, 이미지 파일을 PIL이라는 이미지 객체로 가지고 있는 상태다. 
-> 데이터를 텐서화한다  = 이미지 같은 데이터를 Pytorch가 계산할 수 있는 숫자 덩어리로 바꾼다는 것이다. 
-
-
-> [결과]
-> 유사한 값을 갖는다. 
-> CIFAR10_MEAN = (0.4914, 0.4822, 0.4465)
-> CIFAR10_STD  = (0.2470, 0.2435, 0.2616)
-> 계산한 Mean : 0.4917, 0.4823, 0.4467
-> 계산한 Std : 0.2471, 0.2435, 0.2616
-
-
-
-### 4). DataLoader
-
-> [결과]
- x.shape : torch.Size([128, 3, 32, 32])
- x.dtype : torch.float32
- x.min   : -1.0000
- x.max   : 1.0000
- y[:10]  : tensor([4, 0, 7, 9, 7, 8, 5, 4, 8, 0])
- 
-### 5). 전체 코드 4
+- data.py에서 실험에서 사용할 왜곡되거나 정상적인 데이터셋을 받는 함수를 정의
 
 
 ``` python
-import os
+# data.py
 
-import torch
-import matplotlib.pyplot as plt
+# ruff: noqa
+import yaml
+import os 
+import random
+import numpy as np
+
+import torch as torch
 from torchvision import datasets, transforms
-from torch.utils.data import random_split, DataLoader
-
-train_full = datasets.CIFAR10(
-	root="./data", 
-	train=True,  
-	download=True
-)
-test_set = datasets.CIFAR10(
-	root="./data", 
-	train=False, 
-	download=True
-)
-
-print(len(train_full), len(test_set))   # 50000 10000
+from torch.utils.data import ConcatDataset,Dataset, random_split, DataLoader
+from typing import Dict, Any
 
 
+hyperparameter = {} # 내부 전역 변수
 
-
-## 1. CIFAR-10 클래스 이름
-
-classes = [
-    "airplane",
-    "automobile",
-    "bird",
-    "cat",
-    "deer",
-    "dog",
-    "frog",
-    "horse",
-    "ship",
-    "truck"
-]
-## 2. CIFAR-10 데이터 불러오기
-train_full = datasets.CIFAR10(
-	root="./data", 
-	train=True,  
-	download=True,
-	
-)
-
-
-
-
-## 3. 클래스별 이미지 5장씩 가져오기
-# 각 클래스에서 몇 장을 찾았는지 기록
-class_counts = [0] * 10
-
-# 클래스 별로 이미지를 저장할 공간 확보
-selected_images = [[] for _ in range(10)]
-
-
-for image, label in train_full:
-	# 5개 못 넣었으면
-	if class_counts[label] < 5:
-		selected_images[label].append(image)
-		class_counts[label] +=1
-	
-	# 5개 다 넣었으면 종료
-	if all(count == 5 for count in class_counts ) : 
-		break
-
-## 4. 5x10 격자 만들기
-
-fig, axes = plt.subplots(
-	5,
-	10,
-	figsize = (32,32)
-)
-
-
-## 5. 이미지 출력
-for class_idx in range(10):
-	for image_idx in range (5):
-		image = selected_images[class_idx][image_idx]
-		
-		ax = axes[image_idx, class_idx]
-		
-		ax.imshow(image)
-		
-		ax.set_title(
-			classes[class_idx],
-			fontsize = 8
-		)
-		ax.axis("off")
-plt.tight_layout()
-
-## 6. 이미지 저장
-# 디렉토리 없으면 생성
-os.makedirs("images", exist_ok=True)
-
-# 저장
-plt.savefig(
-	"images/cifar10_samples.png",
-	dpi = 150
-)
-
-plt.show()
-
-
-## 7. 전체 클래스 개수 확인
-
-
-total_counts = [0] * 10
-
-for _, label in train_full:
-	total_counts[label] +=1
-
-print("\n클래스별 데이터 개수")
-
-for i in range(10) : 
+def show_hyperparameter() : 
+	print("<< Hyperparameter Status >> ")
+	print("Concept, batch_size, epochs, lr, momentum, weight_decay,train_num,val_num, width,seed")
 	print(
-		f"{classes[i]:12s}"
-		f"{total_counts[i]}"
+		hyperparameter ["concept"],
+		hyperparameter ["batch_size"],  
+		hyperparameter ["epochs"],  
+		hyperparameter ["lr"],
+		hyperparameter ["momentum"],
+		hyperparameter ["weight_decay"],
+		hyperparameter ["train_num"],
+		hyperparameter ["val_num"],
+		hyperparameter ["width"],
+		hyperparameter ["seed"],
+		hyperparameter ["dropout"],
+		hyperparameter ["scheduler"],
+		hyperparameter ["augmentation"]
 		
 	)
 
-## 8.train_data의 mean,std 수동 계산
-norm_transform = transforms.Compose([
-	transforms.ToTensor()
-
-])
-
-train_full = datasets.CIFAR10(
-	root="./data", 
-	train=True,  
-	download=True,
-	transform=norm_transform
-)
-generator = torch.Generator().manual_seed(42)
-train_data, val_data = random_split(
-	train_full,
-	[45000,5000],
-	generator = generator
-)
 
 
+def get_hyperparameter (config_path : str = "configs/baseline.yaml"):
+	# 여기서 하이퍼 파라미터 딕셔너리로 받아서 바로 사용.
+	global hyperparameter
+	if not os.path.exists(config_path) :
+		raise FileNotFoundError(f"설정한 파일을 찾을 수 없습니다 : {config_path}")
+
+	with open(config_path, "r", encoding="utf-8") as f :
+		hyperparameter = yaml.safe_load(f)
 
 
-print("==Train_data Mean, Std==")
-img = torch.stack([img for img, _ in train_data])
-
-train_mean = img.mean(dim=[0,2,3])
-train_std = img.std(dim=[0,2,3])
-
-print(f"Calculated Mean : {train_mean[0]:.4f}, {train_mean[1]:.4f}, {train_mean[2]:.4f}") 
-print(f"Calculated Std : {train_std[0]:.4f}, {train_std[1]:.4f}, {train_std[2]:.4f}")
+	show_hyperparameter()
+	return hyperparameter
 
 
-## 9.텐서변환 및 정규화
-norm_transform = transforms.Compose([
-	transforms.ToTensor(),
-    transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
-])
+# Seed 고정 함수
+def set_seed(seed: int):
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
 
-train_full = datasets.CIFAR10(
-	root="./data", 
-	train=True,  
-	download=True,
-	transform=norm_transform
-)
-## 10.데이터셋 나누기
-generator = torch.Generator().manual_seed(42)
+def build_transforms(aug_type):
+    transform_list = []
+    
+    # YAML의 augmentation 값에 따라 분기
+    if aug_type == "crop":
+        transform_list.append(transforms.RandomCrop(32, padding=4))
+    elif aug_type == "crop_flip":
+        transform_list.append(transforms.RandomCrop(32, padding=4))
+        transform_list.append(transforms.RandomHorizontalFlip())
+    elif aug_type == "none":
+        pass
+    else:
+        raise ValueError(f"Unknown augmentation option: {aug_type}")
 
-# train_data : 45,000 / 파라미터 학습용
-# val_data : 5,000 / 하이퍼 파라미티 선택용
-# test_data : 10,000 / 최종 성능 체크 ( 봉인, 나중에 씀)
-train_data, val_data = random_split(
-	train_full,
-	[45000,5000],
-	generator = generator
-)
 
-print("train data :", len(train_data))
-print("validation data :", len(val_data))
+    # 기본 필수 변환
+    transform_list.extend([
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
+    ])
+    
+    return transforms.Compose(transform_list)
 
 
 
-## 11.배치 1개 추출
-train_loader = DataLoader(
-	train_data, 
-	batch_size =128, 
-	shuffle=True,
-	num_workers=4, # CPU 코어
-	pin_memory = True, 
-	drop_last = False
-)
+def get_dataloaders (): 
+	# ================== 학습 환경 설정 ==================
+
+	if not hyperparameter : 
+		get_hyperparameter()
+
+	# 1). 데이터셋 불러오기 (CIFAR10 :  텐서변환, 정규화)
+	norm_transform = build_transforms(hyperparameter["augmentation"])
+      
+	train_full = datasets.CIFAR10(
+		root="./data", 
+		train=True,  
+		download=True,
+		transform=norm_transform
+	)
+	generator = torch.Generator().manual_seed(hyperparameter ["seed"])
+
+	train_num = hyperparameter ["train_num"]
+	val_num = hyperparameter ["val_num"]
+	unused_num = len(train_full)-(train_num+val_num)
+
+	# 2). train/validation 데이터셋 분리
+	train_data, val_data, _ = random_split(
+		train_full,
+		[train_num, val_num, unused_num],
+		generator = generator
+	)
+
+	# print("train data :", len(train_data))
+	# print("validation data :", len(val_data))
 
 
-images, labels = next(iter(train_loader)) 
-# iter로 이터레이터 생성, next로 앞서 만든 이터레이터에서 하나 뽑음.
-print(f"x.shape : {images.shape}")
-print(f"x.dtype : {images.dtype}")
-print(f"x.min   : {images.min():.4f}")
-print(f"x.max   : {images.max():.4f}")
-print(f"y[:10]  : {labels[:10]}")
+
+	# 3). 데이터 로더 설정
+	train_loader = DataLoader(
+		train_data, 
+		batch_size =hyperparameter ["batch_size"], 
+		shuffle=True, # 편향을 막기 위해 필요하다.
+		num_workers=4, # CPU 코어
+		pin_memory = True, 
+		drop_last = False
+	)
+
+	val_loader = DataLoader(
+		val_data,
+		batch_size = hyperparameter ["batch_size"],
+		shuffle = False, # 검증용도라 셔플 필요가 없다.
+		num_workers = 4,
+		pin_memory = True,
+		drop_last = False
+	)
+
+	return train_loader, val_loader
+
+def getTest_dataloaders(config_path : str ) :
+
+    # MEAN과 STD는 CIFAR-10 표준 값을 사용합니다.
+    CIFAR10_MEAN = (0.4914, 0.4822, 0.4465)
+    CIFAR10_STD  = (0.2470, 0.2435, 0.2616)
+
+    if not hyperparameter : 
+        get_hyperparameter(config_path) 
+                
+
+    test_transform = transforms.Compose([
+        transforms.ToTensor(),
+        transforms.Normalize(CIFAR10_MEAN, CIFAR10_STD)
+    ])
+
+    # 2. CIFAR-10 Test 데이터셋 로드 (transform 필수 포함)
+    test_set = datasets.CIFAR10(
+        root="./data", 
+        train=False, 
+        download=True,
+        transform=test_transform  # <- 전처리 전달 필수!
+    )
+
+    # 3. DataLoader 생성
+    # Test 세트는 섞을 필요가 없으므로 shuffle=False
+    test_loader = DataLoader(
+        test_set, 
+        batch_size=hyperparameter["batch_size"], 
+        shuffle=False, 
+        num_workers=4,
+        pin_memory=True
+    )
+
+    # 4. test_loader 반환
+    return test_loader
 
 
+# ==========  <day 5 : 7-b : 데이터 누수 실험>  ================
 
 
+# Custom Dataset Wrapper (PIL Image -> Tensor 및 Transform 적용용)
+class TransformDataset(Dataset):
+
+    def __init__(self, dataset, transform=None):
+        self.dataset = dataset
+        self.transform = transform
+
+    def __getitem__(self, index):
+        img, label = self.dataset[index]
+        if self.transform:
+            img = self.transform(img)
+        return img, label
+
+    def __len__(self):
+        return len(self.dataset)
+
+
+# 1. 원본을 받아서 3배로 먼저 증강하는 함수 
+def augment_dataset(base_dataset, multiplier=3):
+    # 원본용 전처리
+    base_transform = transforms.Compose(
+        [
+            transforms.ToTensor(),
+            transforms.Normalize(
+                mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]
+            ),
+        ]
+    )
+
+    # 증강용 전처리 (Random Crop, Flip, Rotation)
+    aug_transform = transforms.Compose(
+        [
+            transforms.RandomCrop(32, padding=4),
+            transforms.RandomHorizontalFlip(p=0.5),
+            transforms.RandomRotation(degrees=15),
+            transforms.ToTensor(),
+            transforms.Normalize(
+                mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]
+            ),
+        ]
+    )
+
+    datasets_list = []
+
+    # 원본 1배 (500장)
+    datasets_list.append(
+        TransformDataset(base_dataset, transform=base_transform)
+    )
+
+    # 증강 2배 (500장 x 2 = 1000장)
+    for _ in range(multiplier - 1):
+        datasets_list.append(
+            TransformDataset(base_dataset, transform=aug_transform)
+        )
+
+    # 총 1500장으로 병합
+    return ConcatDataset(datasets_list)
+
+
+# 2. 잘못된 방식 B의 DataLoader 구축 함수
+def get_dataloaders_experiment_B(multiplier=3):
+    
+    if not hyperparameter:
+        get_hyperparameter("configs/baseline_dataleak.yaml")
+        
+    # CIFAR-10 원본 로드 
+    raw_train_full = datasets.CIFAR10(root="./data", train=True, download=True)
+    generator = torch.Generator().manual_seed(hyperparameter["seed"])
+
+    # 1) 원본에서 500장 추출
+    target_500_dataset, _, _ = random_split(
+        raw_train_full,
+        [500, len(raw_train_full) - 500, 0],
+        generator=generator,
+    )
+
+    # 2) [의도적 오류] Split 하기 전에 먼저 3배로 증강 (500장 -> 1500장)
+    augmented_1500_dataset = augment_dataset(
+        target_500_dataset, multiplier=multiplier
+    )
+
+    # 3) [의도적 오류] 데이터 누수가 존재하는 1500장을 1200장 / 300장으로 Split
+    total_len = len(augmented_1500_dataset)  # 1500
+    val_num = 300
+    train_num = total_len - val_num  # 1200
+
+    train_data, val_data = random_split(
+        augmented_1500_dataset, [train_num, val_num], generator=generator
+    )
+
+    print(
+        f"[실험 B - 잘못된 Split]  Train: {len(train_data)}장, Val: {len(val_data)}장"
+    )
+
+    # 4) DataLoader 반환
+    train_loader = DataLoader(
+        train_data,
+        batch_size=hyperparameter["batch_size"],
+        shuffle=True,
+        num_workers=4,
+    )
+    val_loader = DataLoader(
+        val_data,
+        batch_size=hyperparameter["batch_size"],
+        shuffle=False,
+        num_workers=4,
+    )
+
+    return train_loader, val_loader
+
+# 2. 올바른 방식 B의 DataLoader 구축 함수
+def get_dataloaders_experiment_B_proper(multiplier=3):
+
+    if not hyperparameter:
+        get_hyperparameter("configs/baseline_dataleak.yaml")
+
+    # CIFAR-10 원본 로드 (Transform 미적용 raw 이미지 상태)
+    raw_train_full = datasets.CIFAR10(root="./data", train=True, download=True)
+    generator = torch.Generator().manual_seed(hyperparameter["seed"])
+
+    # 1) 원본에서 500장 추출
+    target_500_dataset, _, _ = random_split(
+        raw_train_full,
+        [500, len(raw_train_full) - 500, 0],
+        generator=generator,
+    )
+
+    # 2) 올바른 순서: 먼저 500장을 Train 400장 / Val 100장으로 Split
+    train_raw, val_raw = random_split(
+        target_500_dataset, [400, 100], generator=generator
+    )
+
+    # 3) Train 세트 400장을 k배로 증강 (400장 -> 1200장)
+    augmented_train_dataset = augment_dataset(
+        train_raw, multiplier=multiplier
+    )
+
+    # 4) Val 세트 증강 없이 기본 전처리(ToTensor, Normalize)만 입혀줌
+    val_transform = transforms.Compose(
+        [
+            transforms.ToTensor(),
+            transforms.Normalize(
+                mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]
+            ),
+        ]
+    )
+    val_dataset = TransformDataset(val_raw, transform=val_transform)
+
+    print(
+        f"[실험 A - 올바른 Split] Train(증강후): {len(augmented_train_dataset)}장 , Val: {len(val_dataset)}장"
+    )
+
+    # 5) DataLoader 생성 (수정: augmented_train_dataset 과 val_dataset 사용)
+    train_loader = DataLoader(
+        augmented_train_dataset,  # 증강된 데이터셋 전달
+        batch_size=hyperparameter["batch_size"],
+        shuffle=True,
+        num_workers=4,
+        pin_memory=True,
+    )
+    val_loader = DataLoader(
+        val_dataset,  # 기본 전처리가 적용된 데이터셋 전달
+        batch_size=hyperparameter["batch_size"],
+        shuffle=False,
+        num_workers=4,
+        pin_memory=True,
+    )
+
+    return train_loader, val_loader
+	
 
 ```
 
@@ -269,6 +377,8 @@ print(f"y[:10]  : {labels[:10]}")
 
 ## 3. 모델 직접 구현 (Day 2)
 - src/train/model.py 에 SmallCNN(nn.Module)을 만든다.
+
+
 
 ### 1). 모델 스펙
 
@@ -301,11 +411,6 @@ print(f"y[:10]  : {labels[:10]}")
 
 
 ``` python
-# ruff: noqa
-import torch as torch
-from torch import nn
-
-# ================== 모델 정의 ==================
 class SmallCNN ( nn.Module) :
     def __init__ (self, width: int =32, dropout_p : float = 0.5) :
         super().__init__()
@@ -356,32 +461,25 @@ class SmallCNN ( nn.Module) :
         x = self.head(x)
         return x
 
-if __name__ == "__main__" :
-    print("Direct Call")
-
-
-```
-
-
-### 3). 체크
-
-``` python
-
-
-
 ```
 
 
 
 ---
+
 ## 4. 학습 루프 구현 (Day 2)
 
-- train.py
+- train.py에서 학습에 필요한 함수 구현 
 ``` python
-
 # ruff: noqa
 import csv
+import os
+import sys
 
+# W&B 모듈이 import 될 때 sys.stdout을 가로채지 못하도록 원본 C-Stream(fd 1)으로 강제 고정
+_orig_stdout = sys.stdout
+import wandb
+sys.stdout = _orig_stdout
 
 import torch as torch
 from torch import nn
@@ -389,14 +487,21 @@ from torch import optim
 from model import SmallCNN
 from data  import get_dataloaders
 from data  import get_hyperparameter
-from data  import set_hyperparameter
+from data  import set_seed
 
+from torch.utils.data import DataLoader
+from typing import Dict, Any
+from plot_curves import plot
+from torch.optim.lr_scheduler import CosineAnnealingLR
 
-def train () :
-    # ================== 학습 데이터셋 / 하이퍼파라미터==================
+# 깨지거나 닫힌 표준 출력(stdout)을 OS 터미널 장치로 강제 재연결
+try:
+    sys.stdout.fileno()
+except Exception:
+    sys.stdout = open('/dev/stdout', 'w')
 
-    train_loader, val_loader = get_dataloaders()
-    hyperparameter = get_hyperparameter() 
+def train (train_loader :DataLoader,val_loader : DataLoader, hyperparameter : Dict[str, Any], csv_path : str = "training_log.csv", wandbOn: bool =True) :
+
 
 
     # ================== 모델 학습 ==================
@@ -407,28 +512,44 @@ def train () :
     # model.parameters() : 모델의 학습 가능한 모든 파라미터를 반환합니다.
 
 
-
+    print(f"Train Start ! , Width = {hyperparameter['width']}")
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu") # GPU 세팅
 
-    model = SmallCNN(width=32, dropout_p=0.5).to(device) # 모델 생성
+    model = SmallCNN(width=hyperparameter["width"], dropout_p=hyperparameter["dropout"]).to(device) # 모델 생성
     criterion = nn.CrossEntropyLoss() # 손실함수 정의 (분류 문제)
     optimizer = torch.optim.SGD( # 옵티마이저 정의
         model.parameters(), 
-        lr= hyperparameter["lr"], 
-        momentum= hyperparameter["momentum"], 
-        weight_decay=hyperparameter["weight_decay"]
+        lr = hyperparameter["lr"], 
+        momentum = hyperparameter["momentum"], 
+        weight_decay = float(hyperparameter["weight_decay"])
     ) # 옵티마이저 정의
+
+    # YAML의 scheduler 값에 따라 스케줄러 생성
+    scheduler_type = hyperparameter['scheduler']
+
+    if scheduler_type == "cosine":
+        scheduler = CosineAnnealingLR(optimizer, T_max=hyperparameter["epochs"])
+    elif scheduler_type == "none":
+        scheduler = None
+    else:
+        raise ValueError(f"Unknown scheduler option: {scheduler_type}")
 
     # print(model) # 모델 구조 확인 가능
 
 
 
     # 저장할 파일 설정
-    csv_path = "training_log.csv"
+    os.makedirs('checkpoints', exist_ok=True)
+
     with open(csv_path, mode = 'w', newline="", encoding="utf-8") as f :
         writer = csv.writer(f)
         writer.writerow(["epoch", "lr", "train_loss", "train_acc", "val_loss", "val_acc"])
             
+
+    # 최고 epoch의 지표
+    bestVal_loss = float('inf') # 양의 무한대 사용.
+    patience = 0
+    best_epoch = 0
 
 
     for epoch in range(1, hyperparameter["epochs"] + 1) :
@@ -472,12 +593,13 @@ def train () :
             train_loss += loss.item() * x.size(0) # loss.item() : loss를 스칼라로 변환, x.size(0) : 배치 크기
         # 3). epoch 횟수별 평균 train_loss, train_acc 계산
         epoch_train_loss = train_loss / len(train_loader.dataset) # 평균 loss 계산
-        epoch_train_acc = train_correct / len(train_loader.dataset) # 평균 정확도 계산
-        print(f"Epoch [{epoch}/{hyperparameter['epochs']}], Train Loss: {epoch_train_loss:.4f}, Train Acc: {epoch_train_acc:.4f}")
+        epoch_train_acc = train_correct / len(train_loader.dataset) # 평균 정확도 계산     
+        print(f"Epoch [{epoch}/{hyperparameter['epochs']}], Train Loss: {epoch_train_loss:.4f}, Train Acc: {epoch_train_acc:.4f}", flush=True)
 
-
+        
 
         # ---------- validate ----------
+
         # 4) 모델을 평가 모드로
         model.eval() # 평가 모드로 전환, dropout, batchnorm 등 학습용 레이어 비활성화
 
@@ -489,16 +611,23 @@ def train () :
                 x = x.to(device) # 데이터를 CPU 메모리에서 GPU 메모리로 옮기기
                 y = y.to(device)
                 pred = model(x) 
+                val_step_loss = criterion(pred, y)
 
                 preds = pred.argmax(dim=1) # 예측값 중 가장 큰 값의 인덱스를 가져온다. 
                 val_correct += torch.sum(preds == y ).item()
-                val_loss += loss.item() * x.size(0) # loss.item() : loss를 스칼라로 변환, x.size(0) : 배치 크기
+                val_loss += val_step_loss.item() * x.size(0) # loss.item() : loss를 스칼라로 변환, x.size(0) : 배치 크기
                                     
         # 6) val_loss, val_acc 계산
         epoch_val_loss = val_loss / len(val_loader.dataset) # 평균 loss 계산
         epoch_val_acc = val_correct / len(val_loader.dataset) # 평균 정확도 계산
-        print(f"Epoch [{epoch}/{hyperparameter['epochs']}], Val Loss: {epoch_val_loss:.4f}, Val Acc: {epoch_val_acc:.4f}")
+        print(f"Epoch [{epoch}/{hyperparameter['epochs']}], Val Loss: {epoch_val_loss:.4f}, Val Acc: {epoch_val_acc:.4f}", flush=True)
 
+        # ---------- 스케줄러 단계 업데이트 ----------
+        if scheduler is not None:
+            scheduler.step()
+
+        # 현재 적용된 실제 학습률 가져오기
+        current_lr = optimizer.param_groups[0]['lr']
 
 
         # ---------- 기록 ----------
@@ -507,93 +636,50 @@ def train () :
             writer = csv.writer(f)
             writer.writerow([
                 epoch,
-                hyperparameter["lr"],
+                current_lr,
                 round(epoch_train_loss, 4),
                 round(epoch_train_acc, 4),
                 round(epoch_val_loss, 4),
                 round(epoch_val_acc, 4),
             ])
-
+        if wandbOn :
+            wandb.log({"epoch": epoch, "train/loss": epoch_train_loss, "train/acc": epoch_train_acc,
+            "val/loss": epoch_val_loss, "val/acc": epoch_val_acc, "lr": current_lr})    
 
         # 8) 콘솔에도 한 줄 출력
-        print(f"Epoch [{epoch}/{hyperparameter['epochs']}] 저장 완료!")
+        print(f"Epoch [{epoch}/{hyperparameter['epochs']}] 저장 완료!", flush=True)
 
-if __name__ == "__main__" :
-    print("Direct Call")
-    train() 
-    
-```
-- plot_curves.py
-```python
-
-
-import matplotlib.pyplot as plt
-import pandas as pd
+        # 9) Early Stooping & CheckPoint (Standard = Loss)
+        # 함수로 만들 필요가 있다.
+        if bestVal_loss > epoch_val_loss : 
+            bestVal_loss = epoch_val_loss
+            patience = 0 
+            best_epoch = epoch
+            torch.save(model.state_dict(), 'checkpoints/best.pt')
 
 
+        else : patience += 1   
 
-def plot() : 
-    # 1). Train 데이터 가져오기
-    df =pd.read_csv("training_log.csv")
-    epochs = df["epoch"]
-    train_loss = df["train_loss"]
-    val_loss = df["val_loss"]
-    train_acc = df["train_acc"]
-    val_acc = df["val_acc"]
-    
+        if patience >= 10 :   # best_epoch, best_val_matric 출력, CSV/ 로그에 남기기
+            print("[Over Patience, Training Over ! ]", flush=True) 
+            print(f"[ Best Epoch : {best_epoch} ]", flush=True)
+            print(f"[ Best Loss : {bestVal_loss} ]", flush=True)
 
-    # 2). 그래프 생성
-   
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
+            # CSV / 로그 저장
+            best_csv_path = "best_" + csv_path
+            file_exists = os.path.exists(best_csv_path)
 
-    # 왼쪽: Loss 그래프 (2개 변수)
-    ax1.plot(epochs, train_loss, label="Train Loss", color="blue", marker="o")
-    ax1.plot(epochs, val_loss, label="Val Loss", color="orange", marker="o")
-    ax1.set_title("Loss Trend")
-    ax1.set_xlabel("Epoch")
-    ax1.set_ylabel("Loss")
-    ax1.legend()
-    ax1.grid(True)
-
-    # 오른쪽: Accuracy 그래프 (2개 변수)
-    ax2.plot(epochs, train_acc, label="Train Acc", color="green", marker="s")
-    ax2.plot(epochs, val_acc, label="Val Acc", color="red", marker="s")
-    ax2.set_title("Accuracy Trend")
-    ax2.set_xlabel("Epoch")
-    ax2.set_ylabel("Accuracy")
-    ax2.legend()
-    ax2.grid(True)
-
-    plt.tight_layout()
-    plt.savefig("../../img/train_plt.png")
-    plt.show()
-        
-
-if __name__ == "__main__" :
-    plot() 
+            with open(best_csv_path, 'a', newline='', encoding="utf-8") as f:
+                writer = csv.writer(f)
+                if not file_exists:
+                    writer.writerow(["width", "best_epoch", "best_val_loss", "epoch_val_acc"])
+                writer.writerow([hyperparameter["width"], best_epoch, round(bestVal_loss, 4), round(epoch_val_acc, 4)])
+            if wandbOn :
+                wandb.summary["best_val_acc"] = epoch_val_acc
+                wandb.summary["best_epoch"] = best_epoch
+                
+            break
+    wandb.finish()
+    return model
 
 ```
-
-----
-## 5. 과적합 제조 (Day 3)
-
-
-
-
-
----
-## 6. 실험관리도구 (Day 3)
-
-
-
-
-
----
-## 7. 통제 실험(Day 4)
-
-
-
----
-## 8. 함정 체험 (Day 5)
-
-
