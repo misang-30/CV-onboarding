@@ -268,11 +268,13 @@ if __name__ == "__main__" :
         )
 
     # train 시작 
-    set_seed(hyperparameter['seed'])
+    wandbOn = False
 
-    wandb.init(project="cifar10-onboarding", name = run_name, config=hyperparameter)
+    set_seed(hyperparameter['seed'])
+    if wandbOn : 
+        wandb.init(project="cifar10-onboarding", name = run_name, config=hyperparameter)
     train_loader, val_loader = get_dataloaders()
 
-    train(train_loader, val_loader,hyperparameter ) 
+    train(train_loader, val_loader,hyperparameter,wandbOn ) 
     fileName = "training_log.csv"
     plot(fileName) 

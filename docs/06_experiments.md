@@ -307,7 +307,7 @@
 - 반면 Batch 512에서는 가장 낮은 성능을 보였다. batch 사이즈가 클 수록 앞서 말한 노이즈의 역할을 하지 못해 local minima에 갇힐 수 있다. 이로 인해 낮은 성능을 기록한다.
 
 - 가장 효과적이었던 기법: Width 확장(64, 86.28%)과 Data Augmentation (Crop+Flip, 85.18%)
-
+- Data Augmentation이 가장 효과적인 기법이라고 생각한다. Width 확장의 경우, 처리속도에 Data Augmentation이 더 짧은 시간을 기록하였다.
 
 ---
 ## 7. 함정 체험
