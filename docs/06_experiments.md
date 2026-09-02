@@ -353,3 +353,10 @@ Test Loss: 3.6378, Test Accuracy: 24.20%
 - Test 데이터셋을 이용한 성능 평가 역시 이를 보여준다.
 
 ### 3). 실험 C
+- baseline 기준에서 best.pt를 사용하였다.
+- 
+- Val Set 평가 : Test Loss: 0.5800 | Test Accuracy: 81.10%
+- Test Set 평가 : Test Loss: 1.0653 | Test Accuracy: 70.91%
+- 성능 차이 (Val - Test) : 	-0.4853 | 	-10.19%
+- Val Set에 맞춰 최적화된 하이퍼파라미터 및 가중치는 완전히 새로운 Test Set에서 성능 저하(Loss 상승 및 Accuracy 감소)를 보인다.
+- Val에 과적합되어있는 양상을 보인다.

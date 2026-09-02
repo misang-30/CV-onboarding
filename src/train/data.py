@@ -134,14 +134,14 @@ def get_dataloaders ():
 
 	return train_loader, val_loader
 
-def getTest_dataloaders(config_path : str ) :
+def getTest_dataloaders() :
 
     # MEAN과 STD는 CIFAR-10 표준 값을 사용합니다.
     CIFAR10_MEAN = (0.4914, 0.4822, 0.4465)
     CIFAR10_STD  = (0.2470, 0.2435, 0.2616)
 
     if not hyperparameter : 
-        get_hyperparameter(config_path) 
+        get_hyperparameter() 
                 
 
     test_transform = transforms.Compose([
