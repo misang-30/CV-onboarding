@@ -1,8 +1,13 @@
 # ruff: noqa
 import csv
 import os
+import sys
 
+# W&B 모듈이 import 될 때 sys.stdout을 가로채지 못하도록 원본 C-Stream(fd 1)으로 강제 고정
+_orig_stdout = sys.stdout
 import wandb
+sys.stdout = _orig_stdout
+
 import torch as torch
 from torch import nn
 from torch import optim
@@ -15,7 +20,11 @@ from typing import Dict, Any
 from plot_curves import plot
 from torch.optim.lr_scheduler import CosineAnnealingLR
 
-
+# 깨지거나 닫힌 표준 출력(stdout)을 OS 터미널 장치로 강제 재연결
+try:
+    sys.stdout.fileno()
+except Exception:
+    sys.stdout = open('/dev/stdout', 'w')
 
 def train (train_loader :DataLoader,val_loader : DataLoader, hyperparameter : Dict[str, Any], csv_path : str = "training_log.csv", wandbOn: bool =True) :
 
@@ -111,7 +120,7 @@ def train (train_loader :DataLoader,val_loader : DataLoader, hyperparameter : Di
         # 3). epoch 횟수별 평균 train_loss, train_acc 계산
         epoch_train_loss = train_loss / len(train_loader.dataset) # 평균 loss 계산
         epoch_train_acc = train_correct / len(train_loader.dataset) # 평균 정확도 계산     
-        print(f"Epoch [{epoch}/{hyperparameter['epochs']}], Train Loss: {epoch_train_loss:.4f}, Train Acc: {epoch_train_acc:.4f}")
+        print(f"Epoch [{epoch}/{hyperparameter['epochs']}], Train Loss: {epoch_train_loss:.4f}, Train Acc: {epoch_train_acc:.4f}", flush=True)
 
         
 
@@ -137,7 +146,7 @@ def train (train_loader :DataLoader,val_loader : DataLoader, hyperparameter : Di
         # 6) val_loss, val_acc 계산
         epoch_val_loss = val_loss / len(val_loader.dataset) # 평균 loss 계산
         epoch_val_acc = val_correct / len(val_loader.dataset) # 평균 정확도 계산
-        print(f"Epoch [{epoch}/{hyperparameter['epochs']}], Val Loss: {epoch_val_loss:.4f}, Val Acc: {epoch_val_acc:.4f}")
+        print(f"Epoch [{epoch}/{hyperparameter['epochs']}], Val Loss: {epoch_val_loss:.4f}, Val Acc: {epoch_val_acc:.4f}", flush=True)
 
         # ---------- 스케줄러 단계 업데이트 ----------
         if scheduler is not None:
@@ -164,7 +173,7 @@ def train (train_loader :DataLoader,val_loader : DataLoader, hyperparameter : Di
             "val/loss": epoch_val_loss, "val/acc": epoch_val_acc, "lr": current_lr})    
 
         # 8) 콘솔에도 한 줄 출력
-        print(f"Epoch [{epoch}/{hyperparameter['epochs']}] 저장 완료!")
+        print(f"Epoch [{epoch}/{hyperparameter['epochs']}] 저장 완료!", flush=True)
 
         # 9) Early Stooping & CheckPoint (Standard = Loss)
         # 함수로 만들 필요가 있다.
@@ -178,9 +187,9 @@ def train (train_loader :DataLoader,val_loader : DataLoader, hyperparameter : Di
         else : patience += 1   
 
         if patience >= 10 :   # best_epoch, best_val_matric 출력, CSV/ 로그에 남기기
-            print("[Over Patience, Training Over ! ]") 
-            print(f"[ Best Epoch : {best_epoch} ]")
-            print(f"[ Best Loss : {bestVal_loss} ]")
+            print("[Over Patience, Training Over ! ]", flush=True) 
+            print(f"[ Best Epoch : {best_epoch} ]", flush=True)
+            print(f"[ Best Loss : {bestVal_loss} ]", flush=True)
 
             # CSV / 로그 저장
             best_csv_path = "best_" + csv_path
@@ -194,8 +203,9 @@ def train (train_loader :DataLoader,val_loader : DataLoader, hyperparameter : Di
             if wandbOn :
                 wandb.summary["best_val_acc"] = epoch_val_acc
                 wandb.summary["best_epoch"] = best_epoch
-                wandb.finish()
+                
             break
+    wandb.finish()
 
 
 if __name__ == "__main__" :
@@ -257,7 +267,14 @@ if __name__ == "__main__" :
             f"_lr{hyperparameter['lr']}"
 
         )
+    elif hyperparameter['concept'] == 'seed' :
+        run_name = (
+            f"{hyperparameter['concept']}"
+            f"_{hyperparameter['seed']}"
+            f"_w{hyperparameter['width']}"
+            f"_lr{hyperparameter['lr']}"
 
+        )
     else :   
         run_name = (
             f"{hyperparameter['concept']}"
@@ -268,13 +285,18 @@ if __name__ == "__main__" :
         )
 
     # train 시작 
-    wandbOn = False
+    wandbOn = True # wandb 사용 여부
 
     set_seed(hyperparameter['seed'])
     if wandbOn : 
-        wandb.init(project="cifar10-onboarding", name = run_name, config=hyperparameter)
+        wandb.init(
+            project="cifar10-onboarding", 
+            name = run_name, 
+            config=hyperparameter,
+            settings=wandb.Settings(console="off", _service_wait= 300)
+        )
     train_loader, val_loader = get_dataloaders()
 
-    train(train_loader, val_loader,hyperparameter,wandbOn ) 
+    train(train_loader, val_loader,hyperparameter, wandbOn=wandbOn)  
     fileName = "training_log.csv"
     plot(fileName) 

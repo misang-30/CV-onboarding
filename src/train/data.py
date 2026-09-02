@@ -83,7 +83,7 @@ def get_dataloaders ():
 	# ================== 학습 환경 설정 ==================
 
 	if not hyperparameter : 
-		get_hyperparameter
+		get_hyperparameter()
 
 	# 1). 데이터셋 불러오기 (CIFAR10 :  텐서변환, 정규화)
 	norm_transform = build_transforms(hyperparameter["augmentation"])

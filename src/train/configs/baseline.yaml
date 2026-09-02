@@ -4,7 +4,7 @@
 # Literally Hyperparameter 
 
 # [실험 핵심]
-concept : "base"      # 아래 파라미터 조합의 실험 핵심을 쓴다. (ex : aug, lr,)
+concept : "seed"      # 아래 파라미터 조합의 실험 핵심을 쓴다. (default : base)(ex : aug, lr,)
 
 # [학습 관련 설정]
 lr: 0.005             # Learning Rate (학습률)(기준 : 0.005)
@@ -19,6 +19,6 @@ augmentation : "none" # 데이터 증강(기준 : none)
 # [모델 및 데이터 관련 설정]
 width: 32            # SmallCNN 모델 채널 폭 (Width) (기준 : 32)
 batch_size: 128      # 배치 크기 (기준 : 128)
-seed: 42             # 재현성을 위한 난수 시드 고정 (기준 : 42)
+seed: 0             # 재현성을 위한 난수 시드 고정 (기준 : 42)
 train_num : 45000    # train data 수 (기준 : 45000)
 val_num : 5000       # validation data 수 (기준 : 5000)
