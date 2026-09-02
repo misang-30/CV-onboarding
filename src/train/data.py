@@ -134,12 +134,42 @@ def get_dataloaders ():
 
 	return train_loader, val_loader
 
-def getTest_dataloaders() :
-	test_set = datasets.CIFAR10(
-		root="./data", 
-		train=False, 
-		download=True
-	)
+def getTest_dataloaders(config_path : str ) :
+
+    # MEAN과 STD는 CIFAR-10 표준 값을 사용합니다.
+    CIFAR10_MEAN = (0.4914, 0.4822, 0.4465)
+    CIFAR10_STD  = (0.2470, 0.2435, 0.2616)
+
+    if not hyperparameter : 
+        get_hyperparameter(config_path) 
+                
+
+    test_transform = transforms.Compose([
+        transforms.ToTensor(),
+        transforms.Normalize(CIFAR10_MEAN, CIFAR10_STD)
+    ])
+
+    # 2. CIFAR-10 Test 데이터셋 로드 (transform 필수 포함)
+    test_set = datasets.CIFAR10(
+        root="./data", 
+        train=False, 
+        download=True,
+        transform=test_transform  # <- 전처리 전달 필수!
+    )
+
+    # 3. DataLoader 생성
+    # Test 세트는 섞을 필요가 없으므로 shuffle=False
+    test_loader = DataLoader(
+        test_set, 
+        batch_size=hyperparameter["batch_size"], 
+        shuffle=False, 
+        num_workers=4,
+        pin_memory=True
+    )
+
+    # 4. test_loader 반환
+    return test_loader
+
 
 # ==========  <day 5 : 7-b : 데이터 누수 실험>  ================
 

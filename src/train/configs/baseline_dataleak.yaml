@@ -4,7 +4,7 @@
 # Literally Hyperparameter 
 
 # [실험 핵심]
-concept : "DataLeak_Wrong"      # 아래 파라미터 조합의 실험 핵심을 쓴다. (default : base)(ex : aug, lr,)
+concept : "DataLeak_Proper"      # 아래 파라미터 조합의 실험 핵심을 쓴다. (default : base)(ex : aug, lr,)
 
 # [학습 관련 설정]
 lr: 0.005             # Learning Rate (학습률)(기준 : 0.005)

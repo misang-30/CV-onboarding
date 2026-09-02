@@ -35,7 +35,7 @@ def test_model(model, test_loader): # 수정 요망 wandb 기능 필요.
     print(f"Test Start ! ")
 
     # 1. 평가모드 전환
-    device = torch.dev하ice("cuda" if torch.cuda.is_available() else "cpu") # GPU 세팅
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu") # GPU 세팅
     criterion = nn.CrossEntropyLoss() # 손실함수 정의 (분류 문제)
 
 
@@ -43,7 +43,7 @@ def test_model(model, test_loader): # 수정 요망 wandb 기능 필요.
     test_loss = 0.0
     correct = 0
     total = 0
-
+    total_loss = 0.0
     # 2. 기울기 계산 비활성화 (평가 시에는 필요 없음)
     with torch.no_grad():
             for x, y in test_loader:
@@ -67,7 +67,7 @@ def test_model(model, test_loader): # 수정 요망 wandb 기능 필요.
     # 6. 전체 데이터셋에 대한 평균 Loss와 Accuracy 계산
     test_loss = total_loss / total
     test_acc = (correct / total) * 100.0  # 백분율(%)
-
+    print(f"Test Loss: {test_loss:.4f}, Test Accuracy: {test_acc:.2f}%")
     return test_loss, test_acc
 
 
@@ -162,14 +162,13 @@ if __name__ == "__main__" :
     if hyperparameter['concept'] == 'DataLeak_Proper' :
         train_loader, val_loader = get_dataloaders_experiment_B_proper()
         model = train(train_loader, val_loader,hyperparameter,csv_path = "training_log_dataleak.csv" ,wandbOn=wandbOn)  
-        test_data = getTest_dataloaders()
+        test_data = getTest_dataloaders("configs/baseline_dataleak.yaml")
         test_model(model, test_data)
 
         
     elif hyperparameter['concept'] == 'DataLeak_Wrong' :
         train_loader, val_loader = get_dataloaders_experiment_B()
         model = train(train_loader, val_loader,hyperparameter,csv_path = "training_log_dataleak.csv" ,wandbOn=wandbOn)  
-        test_data = getTest_dataloaders()
+        test_data = getTest_dataloaders("configs/baseline_dataleak.yaml")
         test_model(model, test_data)
 
-        
