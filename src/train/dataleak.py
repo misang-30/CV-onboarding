@@ -18,6 +18,7 @@ from data  import set_seed
 from data  import get_dataloaders_experiment_B_proper
 from data  import get_dataloaders_experiment_B
 from train import train
+from data  import getTest_dataloaders
 from torch.utils.data import DataLoader
 from typing import Dict, Any
 from plot_curves import plot
@@ -29,6 +30,45 @@ try:
 except Exception:
     sys.stdout = open('/dev/stdout', 'w')
 
+
+def test_model(model, test_loader): # 수정 요망 wandb 기능 필요.
+    print(f"Test Start ! ")
+
+    # 1. 평가모드 전환
+    device = torch.dev하ice("cuda" if torch.cuda.is_available() else "cpu") # GPU 세팅
+    criterion = nn.CrossEntropyLoss() # 손실함수 정의 (분류 문제)
+
+
+    model.eval() # 여기서는 epoch이 필요 없다.
+    test_loss = 0.0
+    correct = 0
+    total = 0
+
+    # 2. 기울기 계산 비활성화 (평가 시에는 필요 없음)
+    with torch.no_grad():
+            for x, y in test_loader:
+                x, y = x.to(device), y.to(device)
+                
+                # 3. 순전파 (Forward)
+                outputs = model(x)
+                
+                # 4. Loss 계산
+                loss = criterion(outputs, y)
+                
+                # 5. Loss 및 Accuracy 누적
+                # batch_size를 곱해서 전체 손실 합을 누적 (마지막 배치가 128개가 아닐 수 있으므로)
+                total_loss += loss.item() * x.size(0)
+                
+                # 예측값 구하기 (가장 높은 확률/점수를 가진 클래스 인덱스)
+                _, preds = torch.max(outputs, 1)
+                correct += (preds == y).sum().item()
+                total += y.size(0)
+
+    # 6. 전체 데이터셋에 대한 평균 Loss와 Accuracy 계산
+    test_loss = total_loss / total
+    test_acc = (correct / total) * 100.0  # 백분율(%)
+
+    return test_loss, test_acc
 
 
 
@@ -121,8 +161,15 @@ if __name__ == "__main__" :
     
     if hyperparameter['concept'] == 'DataLeak_Proper' :
         train_loader, val_loader = get_dataloaders_experiment_B_proper()
-        train(train_loader, val_loader,hyperparameter,csv_path = "training_log_dataleak.csv" ,wandbOn=wandbOn)  
+        model = train(train_loader, val_loader,hyperparameter,csv_path = "training_log_dataleak.csv" ,wandbOn=wandbOn)  
+        test_data = getTest_dataloaders()
+        test_model(model, test_data)
 
+        
     elif hyperparameter['concept'] == 'DataLeak_Wrong' :
         train_loader, val_loader = get_dataloaders_experiment_B()
-        train(train_loader, val_loader,hyperparameter,csv_path = "training_log_dataleak.csv" ,wandbOn=wandbOn)  
+        model = train(train_loader, val_loader,hyperparameter,csv_path = "training_log_dataleak.csv" ,wandbOn=wandbOn)  
+        test_data = getTest_dataloaders()
+        test_model(model, test_data)
+
+        

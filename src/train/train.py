@@ -15,6 +15,7 @@ from model import SmallCNN
 from data  import get_dataloaders
 from data  import get_hyperparameter
 from data  import set_seed
+
 from torch.utils.data import DataLoader
 from typing import Dict, Any
 from plot_curves import plot
@@ -206,7 +207,7 @@ def train (train_loader :DataLoader,val_loader : DataLoader, hyperparameter : Di
                 
             break
     wandb.finish()
-
+    return model
 
 if __name__ == "__main__" :
     print("<< Direct Call >> \n")
