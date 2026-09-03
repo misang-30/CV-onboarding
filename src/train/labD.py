@@ -92,7 +92,7 @@ if __name__ == "__main__":
     # 3.Resnet - Scratch Version 학습 
     print("[Train] Resnet - Scratch Version")
     # 하이퍼 파라미터 값은 baseline.yaml 의 값을 사용한다. 
-    
-    # 4.Resnet - Pretrained 학습 
+
+    # 4.Resnet - Pretrained 학습 # 
     print("[Train] Resnet - Pretrained")
     
