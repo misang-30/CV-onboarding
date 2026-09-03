@@ -74,19 +74,6 @@ def test_model(test_loader, best_ckpt_path="checkpoints/best.pt"):
     print(f"[Result] Test Loss: {test_loss:.4f} | Test Accuracy: {test_acc:.2f}%\n")
     return test_loss, test_acc
 
-def smallcnn() :
-        # 하이퍼파라미터 불러오기
-    hyperparameter = get_hyperparameter()
-
-    # 시드 고정
-    set_seed(hyperparameter["seed"])
-
-    test_data = getTest_dataloaders()
-    _, val_data = get_dataloaders()
-    # 실제 best.pt가 존재하는 파일 경로 지정
-    val_loss, val_acc = test_model(val_data, best_ckpt_path="checkpoints/best.pt")
-    test_loss, test_acc = test_model(test_data, best_ckpt_path="checkpoints/best.pt")
-
 
 if __name__ == "__main__":
     print("<< Direct Call >> \n")

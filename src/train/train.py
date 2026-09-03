@@ -206,7 +206,8 @@ def train (train_loader :DataLoader,val_loader : DataLoader, hyperparameter : Di
                 wandb.summary["best_epoch"] = best_epoch
                 
             break
-    wandb.finish()
+    if wandbOn :
+        wandb.finish()
     return model
 
 if __name__ == "__main__" :
