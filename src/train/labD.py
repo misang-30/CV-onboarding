@@ -1,10 +1,33 @@
+import csv
+import os
+import sys
+
+# W&B 모듈이 import 될 때 sys.stdout을 가로채지 못하도록 원본 C-Stream(fd 1)으로 강제 고정
+_orig_stdout = sys.stdout
+import wandb
+sys.stdout = _orig_stdout
+
 from labC import smallcnn
 import torch
 import torch.nn as nn
 from torchvision.models import models
 import torchvision.datasets as datasets
 import torchvision.transforms as transforms
-from torch.utils.data import Subset
+from torch.utils.data import Subset, DataLoader
+from data import get_hyperparameter
+from data import get_name
+from data import set_seed
+from data import get_dataloaders
+from train import train
+from typing import Dict, Any
+from plot_curves import plot
+
+
+# 깨지거나 닫힌 표준 출력(stdout)을 OS 터미널 장치로 강제 재연결
+try:
+    sys.stdout.fileno()
+except Exception:
+    sys.stdout = open('/dev/stdout', 'w')
 
 
 class ResNet18Scratch:
@@ -53,8 +76,40 @@ class ResNet18FineTune:
     def get_model(self):
         return self.model
 
-# def resnet_train() : 
-#     # not yet
+def train_scratch(hyperparameter : Dict[str, Any], train_loader : DataLoader ) : 
+
+    config = hyperparameter
+    
+    run_name = get_name(hyperparameter)
+
+
+    wandbOn = True # wandb 사용 여부
+
+    set_seed(hyperparameter['seed'])
+    if wandbOn : 
+        wandb.init(
+            project="cifar10-onboarding", 
+            name = run_name, 
+            config=hyperparameter,
+            settings=wandb.Settings(console="off", _service_wait= 300)
+        )
+    train_loader, val_loader = get_dataloaders()
+
+    # train 시작 
+    # ====== train 알고리즘 ==========
+
+    # train(train_loader, val_loader,hyperparameter, wandbOn=wandbOn)  
+
+
+
+    fileName = "SmallCNN_log.csv"
+    plot(fileName) 
+
+
+
+
+def train_finetune (num : int ) :
+    print("not implemented yet")
 
 
 if __name__ == "__main__":
@@ -84,8 +139,13 @@ if __name__ == "__main__":
     dataset_pretrained = datasets.CIFAR10(root='./data', train=True, transform=transform_pretrained)
     subset_pretrained = Subset(dataset_pretrained, indices)
 
- 
-    # 2.SmallCNN 학습
+    # 2.하이퍼 퍼라미터 불러오기
+    hyperparameters = get_hyperparameter()
+
+
+
+
+    # 3.SmallCNN 학습
     print("[Train] SmallCNN ")
     #train() 함수 사용
 

@@ -210,15 +210,7 @@ def train (train_loader :DataLoader,val_loader : DataLoader, hyperparameter : Di
         wandb.finish()
     return model
 
-if __name__ == "__main__" :
-    print("<< Direct Call >> \n")
-    print("<< Day 2 Lab : Train Loop >>\n")
-
-    
-    # 실험 이름과 하이퍼 파리미터 받는다.
-    hyperparameter = get_hyperparameter() # depends on "baseline.yaml"
-    config = hyperparameter
-    
+def get_name(hyperparameter : Dict[str, Any]) -> str:
     if hyperparameter['concept'] == 'train' :
         run_name = (
             f"{hyperparameter['concept']}"
@@ -285,6 +277,22 @@ if __name__ == "__main__" :
             f"_ep{hyperparameter['epochs']}"
 
         )
+
+    return run_name
+
+
+
+
+if __name__ == "__main__" :
+    print("<< Direct Call >> \n")
+    print("<< Day 2 Lab : Train Loop >>\n")
+
+    
+    # 실험 이름과 하이퍼 파리미터 받는다.
+    hyperparameter = get_hyperparameter() # depends on "baseline.yaml"
+    config = hyperparameter
+    
+    run_name = get_name(hyperparameter)
 
     # train 시작 
     wandbOn = True # wandb 사용 여부
