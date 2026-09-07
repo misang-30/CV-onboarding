@@ -683,3 +683,6 @@ def train (train_loader :DataLoader,val_loader : DataLoader, hyperparameter : Di
     return model
 
 ```
+
+## 디버깅
+- Subset으로 데이터셋 나누고, Dataloader로 감싸서 train함수에 제공하는 것이 옳다
