@@ -360,3 +360,45 @@ Test Loss: 3.6378, Test Accuracy: 24.20%
 - 성능 차이 (Val - Test) : 	-0.4853 | 	-10.19%
 - Val Set에 맞춰 최적화된 하이퍼파라미터 및 가중치는 완전히 새로운 Test Set에서 성능 저하(Loss 상승 및 Accuracy 감소)를 보인다.
 - Val에 과적합되어있는 양상을 보인다.
+
+
+### 4). 실험 D
+- 아래 기준으로 baseline_labD 설정
+```
+lr: 0.005            
+momentum: 0.9         
+weight_decay: 0.0     
+epochs: 30            
+dropout : 0.0         
+scheduler : "none"    
+augmentation : "none" 
+width: 32          
+batch_size: 128     
+```
+
+#### (1). SmallCNN 
+- epoch 22에서 
+- val loss : 1.85 (최고 성능)
+- val acc : 0.38
+- train loss : 0.69
+- train acc : 0.88
+
+![](../img/labD_smallCNN.png)
+
+
+#### (2). ResNet Scratch
+- epoch 5에서 
+- val loss : 2.14 (최고 성능)
+- val acc : 0.29
+- train loss : 0.87
+- train acc : 0.832
+![](../img/labD_resnetScratch.png)
+
+#### (3). ResNet Pretrain
+- epoch 6에서 
+- val loss : 1.88 (최고 성능)
+- val acc : 0.36
+- train loss : 0.12
+- train acc : 0.99 
+
+![](../img/labD_resnetPretrain.png)
