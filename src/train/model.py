@@ -1,6 +1,8 @@
 # ruff: noqa
 import torch as torch
 from torch import nn
+import torchvision.models as models
+import torchvision.transforms as transforms
 
 # ================== 모델 정의 ==================
 class SmallCNN ( nn.Module) :
@@ -52,6 +54,35 @@ class SmallCNN ( nn.Module) :
         x = self.block3(x)
         x = self.head(x)
         return x
+
+
+class ResNet18Scratch(nn.Module):
+    def __init__(self, num_classes=10):
+        super().__init__()
+        # 1. 가중치 없이 기본 ResNet18 생성 (Stem: (7x7 conv, stride 2, padding 3 + 3x3 maxpool, stride 2, padding 1))
+        # Stem : 모델 구조에서 입력 이미지를 가장 먼저 받아들이는 모델의 뿌리에 해당하는 극초반 레이어
+        self.model = models.resnet18(weights=None)
+        
+        # 2. 마지막 FC 레이어만 CIFAR-10 클래스 수(10개)로 교체
+        in_features = self.model.fc.in_features
+        self.model.fc = nn.Linear(in_features, num_classes)
+        
+    def forward(self, x):
+        return self.model(x)
+
+class ResNet18FineTun(nn.Module):
+    def __init__(self, num_classes=10):
+        super().__init__()
+        # 1. ImageNet 사전학습 가중치 로드
+        weights = models.ResNet18_Weights.IMAGENET1K_V1
+        self.model = models.resnet18(weights=weights)
+        
+        # 2. 마지막 fc 레이어 교체
+        in_features = self.model.fc.in_features
+        self.model.fc = nn.Linear(in_features, num_classes)
+    
+    def forward(self, x):
+        return self.model(x)
 
 
 
