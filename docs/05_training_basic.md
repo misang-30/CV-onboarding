@@ -686,3 +686,7 @@ def train (train_loader :DataLoader,val_loader : DataLoader, hyperparameter : Di
 
 ## 디버깅
 - Subset으로 데이터셋 나누고, Dataloader로 감싸서 train함수에 제공하는 것이 옳다
+
+## QnA
+- 하이퍼파라미터 실험에서 각 변수를 통제한 상황에서 한 변수의 최적의 값만 모아서 모델에 적용하면 최적의 모델이 되는가?
+- 각 하이퍼파라미터를 따로 실험해서 얻은 최적값들을 단순히 모아 적용한다고 해서 전체적으로 최적의 모델이 되는 것은 아니다. 하이퍼파라미터들이 서로 영향을 주기 때문.
